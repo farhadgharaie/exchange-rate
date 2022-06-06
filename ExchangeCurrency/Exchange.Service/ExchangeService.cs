@@ -68,27 +68,49 @@ namespace Exchange.Service
 
     }
 
+    public interface ICryptoExchange
+    {
+        Dictionary<string, double> ExchangeToTraditional(string cryptoSymbol,ICurrency traditionalCurrency);
+    }
+    public class CryptoExchange : ICryptoExchange
+    {
+        public Dictionary<string, double> ExchangeToTraditional(string cryptoSymbol, ICurrency traditionalCurrency)
+        {
+            var result = new Dictionary<string, double>();
+            foreach (var currency in traditionalCurrency.getAll())
+            {
+                result.Add(currency.symbol, 1);
+            }
+
+            return result;
+        }
+    }
+
+    
     public class CryptoExchangeService
     {
         private readonly ICurrency _cryptoCurrencies;
-        public CryptoExchangeService(ICurrency cryptoCurrencies)
+        private readonly ICryptoExchange _cryptoExchange;
+        public CryptoExchangeService(ICurrency cryptoCurrencies,
+            ICryptoExchange cryptoExchange)
         {
             _cryptoCurrencies = cryptoCurrencies;
+            _cryptoExchange = cryptoExchange;
         }
         
-        public Dictionary<string, double> ToTraditional(string cryptoSymbol, ICurrency traditionalCurrencies)
+        public Dictionary<string, double> ToTraditional(string cryptoSymbol, ICurrency traditionalCurrency )
         {
             if (!_cryptoCurrencies.IsSymbolExist(cryptoSymbol))
             {
                 throw new Exception("Symbol not found");
             }
 
-            var result = new Dictionary<string, double>();
-            foreach (var currency in traditionalCurrencies.getAll())
-            {
-                result.Add(currency.symbol, 1);
-            }
+            var result = _cryptoExchange.ExchangeToTraditional(cryptoSymbol, traditionalCurrency);
             return result;
+        }
+        private double USDQuote(string cryptoSymbol)
+        {
+            return 1;
         }
     }
 

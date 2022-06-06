@@ -14,7 +14,7 @@ namespace ExchangeCurrency.UnitTest
             {
                 new CurrencyModel("testXCV","xcv")
             };
-        public FakeInputCurreny(): base(currencies)
+        public FakeInputCurreny() : base(currencies)
         {
 
         }
@@ -28,13 +28,14 @@ namespace ExchangeCurrency.UnitTest
             };
         public FakeOutputCurrency() : base(currencies)
         {
-            
+
         }
     }
     public class ExchangeCryptoToCurrencyTests
     {
         private readonly Mock<ICurrency> convertToStub = new Mock<ICurrency>();
         private readonly Mock<ICurrency> inputStub = new Mock<ICurrency>();
+        private readonly Mock<ICryptoExchange> cryptoExchangeMoq = new Mock<ICryptoExchange>();
         [Fact]
         public void ExchangeCryptoToTraditional_WithSpecificCrypto_ReturenListOfCurrencies()
         {
@@ -48,11 +49,20 @@ namespace ExchangeCurrency.UnitTest
             inputStub.Setup(a => a.IsSymbolExist(It.IsAny<string>()))
                .Returns(true);
 
+
             convertToStub.Setup(a => a.getAll())
-               .Returns(new FakeOutputCurrency().getAll());
+              .Returns(new FakeOutputCurrency().getAll());
+
+
+            cryptoExchangeMoq.Setup(a => a.ExchangeToTraditional(It.IsAny<string>(), convertToStub.Object))
+                .Returns(new Dictionary<string, double>()
+                                        {
+                                            { "tt2",1},
+                                            { "tt1",1}
+                                        });
 
             //Act
-            var actual = new CryptoExchangeService(inputStub.Object)
+            var actual = new CryptoExchangeService(inputStub.Object, cryptoExchangeMoq.Object)
                                 .ToTraditional(It.IsAny<string>(), convertToStub.Object);
 
             //Assert
@@ -71,8 +81,11 @@ namespace ExchangeCurrency.UnitTest
             inputStub.Setup(a => a.IsSymbolExist(It.IsAny<string>()))
                .Returns(false);
 
+            cryptoExchangeMoq.Setup(a => a.ExchangeToTraditional(cryptoCurrency, convertToStub.Object))
+                .Returns(It.IsAny<Dictionary<string,double>>());
+
             //Act
-            Action act = () => new CryptoExchangeService(inputStub.Object)
+            Action act = () => new CryptoExchangeService(inputStub.Object, cryptoExchangeMoq.Object)
                                 .ToTraditional(cryptoCurrency, convertToStub.Object);
 
             //Assert
