@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Exchange.Common\Exchange.Common.csproj" />
     <ProjectReference Include="..\Exchange.Service\Exchange.Service.csproj" />
   </ItemGroup>
 

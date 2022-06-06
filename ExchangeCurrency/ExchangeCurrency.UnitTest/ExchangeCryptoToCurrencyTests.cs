@@ -1,3 +1,5 @@
+using Exchange.Common.interfaces;
+using Exchange.Common.Currency;
 using Exchange.Service;
 using FluentAssertions;
 using Moq;
