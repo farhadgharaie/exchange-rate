@@ -3,33 +3,44 @@ using FluentAssertions;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace ExchangeCurrency.UnitTest
 {
-    public class FakeOutputCurrency
+    public class FakeInputCurreny : Currency
     {
-        public List<Currency> testOutput()
-        {
-            return new List<Currency>
+        private static List<CurrencyModel> currencies = new List<CurrencyModel>
             {
-                new Currency
-                {
-                    Name="test1",
-                    Symbol="tt1"
-                }
-            };
-        }
-        public List<Currency> testInput()
-        {
-            return new List<Currency>
-            {
-                new Currency
+                new CurrencyModel
                 {
                     Name="testXCV",
                     Symbol="xcv"
                 }
             };
+        public FakeInputCurreny(): base(currencies)
+        {
+
+        }
+    }
+    public class FakeOutputCurrency : Currency
+    {
+        private static List<CurrencyModel> currencies = new List<CurrencyModel>
+            {
+                new CurrencyModel
+                {
+                    Name="test1",
+                    Symbol="tt1"
+                },
+                new CurrencyModel
+                {
+                    Name="test2",
+                    Symbol="tt2"
+                }
+            };
+        public FakeOutputCurrency() : base(currencies)
+        {
+            
         }
     }
     public class ExchangeCryptoToCurrencyTests
@@ -40,22 +51,21 @@ namespace ExchangeCurrency.UnitTest
         public void ExchangeCryptoToTraditional_WithSpecificCrypto_ReturenListOfCurrencies()
         {
             //Arrange
-            var cryptoCurrency = "xcv";
-
-           
-            convertToStub.Setup(a => a.getAll())
-                .Returns(new FakeOutputCurrency().testOutput());
-            inputStub.Setup(a => a.getAll())
-               .Returns(new FakeOutputCurrency().testInput());
-
             var expectedConverts = new Dictionary<string, double>()
             {
+                { "tt2",1},
                 { "tt1",1}
             };
 
+            inputStub.Setup(a => a.IsSymbolExist(It.IsAny<string>()))
+               .Returns(true);
+
+            convertToStub.Setup(a => a.getAll())
+               .Returns(new FakeOutputCurrency().getAll());
+
             //Act
-            var actual = new CryptoExchangeService(inputStub.Object,convertToStub.Object)
-                                .ToTraditional(cryptoCurrency);
+            var actual = new CryptoExchangeService(inputStub.Object)
+                                .ToTraditional(It.IsAny<string>(), convertToStub.Object);
 
             //Assert
             actual.Should().BeEquivalentTo(expectedConverts);
@@ -66,15 +76,16 @@ namespace ExchangeCurrency.UnitTest
         {
             //Arrange
             var cryptoCurrency = "wrongCoin";
-            convertToStub.Setup(a => a.getAll())
-                .Returns(It.IsAny<IEnumerable<Currency>>());
 
-            inputStub.Setup(a => a.getAll())
-               .Returns(new FakeOutputCurrency().testInput());
+            convertToStub.Setup(a => a.getAll())
+                .Returns(It.IsAny<IEnumerable<CurrencyModel>>());
+
+            inputStub.Setup(a => a.IsSymbolExist(It.IsAny<string>()))
+               .Returns(false);
 
             //Act
-            Action act = () => new CryptoExchangeService(inputStub.Object,convertToStub.Object)
-                                .ToTraditional(cryptoCurrency);
+            Action act = () => new CryptoExchangeService(inputStub.Object)
+                                .ToTraditional(cryptoCurrency, convertToStub.Object);
 
             //Assert
             act.Should().Throw<Exception>().WithMessage("Symbol not found");

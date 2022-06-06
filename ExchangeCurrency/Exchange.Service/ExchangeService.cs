@@ -1,104 +1,112 @@
-﻿using System;
+﻿using Exchange.Service;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Exchange.Service
 {
-    public class Currency
+    public class CurrencyModel
     {
         public string Name { get; set; }
         public string Symbol { get; set; }
     }
-    public class TraditionalCurrency : ICurrency
+    public class Currency : ICurrency
     {
-        public IEnumerable<Currency> currencies = new List<Currency>
+        public IEnumerable<CurrencyModel> _currencies { get; set; }
+        public Currency(IEnumerable<CurrencyModel> currencies)
         {
-            new Currency
+            _currencies = currencies;
+        }
+        public IEnumerable<CurrencyModel> getAll()
+        {
+            return _currencies;
+        }
+
+        public bool IsSymbolExist(string symbol)
+        {
+            return _currencies.Any(a => a.Symbol.Contains(symbol, StringComparison.OrdinalIgnoreCase));
+        }
+    }
+    public class TraditionalCurrency : Currency
+    {
+        private static List<CurrencyModel> currencies = new List<CurrencyModel>
+        {
+            new CurrencyModel
             {
                 Name="Dollar",
                 Symbol= "USD"
             },
-            new Currency
+            new CurrencyModel
             {
                 Name="Euro",
                 Symbol= "EUR"
             },
-            new Currency
+            new CurrencyModel
             {
                 Name="Brazilian real",
                 Symbol= "BRL"
             },
-            new Currency
+            new CurrencyModel
             {
                 Name="British pound sterling",
                 Symbol= "GBP"
             },
-            new Currency
+            new CurrencyModel
             {
                 Name="Australian dollar",
                 Symbol= "AUD"
             }
         };
-        public IEnumerable<Currency> getAll()
+        public TraditionalCurrency() : base(currencies)
         {
-            return currencies;
+
         }
     }
-    public class CryptoCurrency : ICurrency
+    public class CryptoCurrency : Currency
     {
-        public IEnumerable<Currency> currencies = new List<Currency>
+        private static List<CurrencyModel> currencies = new List<CurrencyModel>
         {
-             new Currency
+             new CurrencyModel
             {
                 Name="Bitcoin",
                 Symbol= "BTC"
             }
         };
-        public IEnumerable<Currency> getAll()
+        public CryptoCurrency():base(currencies)
         {
-            return currencies;
+
         }
+       
     }
     public interface ICurrency
     {
-        IEnumerable<Currency> getAll();
+        IEnumerable<CurrencyModel> getAll();
+        bool IsSymbolExist(string symbol);
+
     }
 
-    public class CryptoExchangeService : ExchangeService 
+    public class CryptoExchangeService
     {
         private readonly ICurrency _cryptoCurrencies;
-        public CryptoExchangeService(ICurrency cryptoCurrencies, ICurrency convertTo):base (convertTo)
+        public CryptoExchangeService(ICurrency cryptoCurrencies)
         {
             _cryptoCurrencies = cryptoCurrencies;
         }
         
-        public Dictionary<string, double> ToTraditional(string cryptoSymbol)
+        public Dictionary<string, double> ToTraditional(string cryptoSymbol, ICurrency traditionalCurrencies)
         {
-            if (!isExist(cryptoSymbol))
+            if (!_cryptoCurrencies.IsSymbolExist(cryptoSymbol))
             {
                 throw new Exception("Symbol not found");
             }
             var result = new Dictionary<string, double>();
-            foreach (var currency in _convertTo.getAll())
+            foreach (var currency in traditionalCurrencies.getAll())
             {
                 result.Add(currency.Symbol, 1);
             }
             return result;
-
-           
-        }
-        private bool isExist(string cryptoSymbol)
-        {
-            return _cryptoCurrencies.getAll().ToList().Exists(a => a.Symbol.Contains(cryptoSymbol, StringComparison.OrdinalIgnoreCase));
         }
     }
 
-    public class ExchangeService
-    {
-        protected readonly ICurrency _convertTo;
-        public ExchangeService(ICurrency convertTo)
-        {
-            _convertTo = convertTo;
-        }
-    }
+    
 }
