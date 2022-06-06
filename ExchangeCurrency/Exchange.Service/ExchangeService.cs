@@ -7,8 +7,14 @@ namespace Exchange.Service
 {
     public class CurrencyModel
     {
-        public string Name { get; set; }
-        public string Symbol { get; set; }
+        protected string _name { get; private set; }
+        public string symbol { get; private set; }
+        public CurrencyModel(string name,string symbol)
+        {
+            _name = name;
+            this.symbol = symbol;
+
+        }
     }
     public class Currency : ICurrency
     {
@@ -24,38 +30,19 @@ namespace Exchange.Service
 
         public bool IsSymbolExist(string symbol)
         {
-            return _currencies.Any(a => a.Symbol.Contains(symbol, StringComparison.OrdinalIgnoreCase));
+            return _currencies.Any(a => a.symbol.Contains(symbol, StringComparison.OrdinalIgnoreCase));
         }
     }
     public class TraditionalCurrency : Currency
     {
         private static List<CurrencyModel> currencies = new List<CurrencyModel>
         {
-            new CurrencyModel
-            {
-                Name="Dollar",
-                Symbol= "USD"
-            },
-            new CurrencyModel
-            {
-                Name="Euro",
-                Symbol= "EUR"
-            },
-            new CurrencyModel
-            {
-                Name="Brazilian real",
-                Symbol= "BRL"
-            },
-            new CurrencyModel
-            {
-                Name="British pound sterling",
-                Symbol= "GBP"
-            },
-            new CurrencyModel
-            {
-                Name="Australian dollar",
-                Symbol= "AUD"
-            }
+            new CurrencyModel("Dollar","USD"),
+            new CurrencyModel("Euro","EUR"),
+            new CurrencyModel("Brazilian real","BRL"),
+            new CurrencyModel("British pound sterling","GBP"),
+            new CurrencyModel("Australian dollar","AUD")
+           
         };
         public TraditionalCurrency() : base(currencies)
         {
@@ -66,11 +53,7 @@ namespace Exchange.Service
     {
         private static List<CurrencyModel> currencies = new List<CurrencyModel>
         {
-             new CurrencyModel
-            {
-                Name="Bitcoin",
-                Symbol= "BTC"
-            }
+             new CurrencyModel("Bitcoin", "BTC")
         };
         public CryptoCurrency():base(currencies)
         {
@@ -99,10 +82,11 @@ namespace Exchange.Service
             {
                 throw new Exception("Symbol not found");
             }
+
             var result = new Dictionary<string, double>();
             foreach (var currency in traditionalCurrencies.getAll())
             {
-                result.Add(currency.Symbol, 1);
+                result.Add(currency.symbol, 1);
             }
             return result;
         }

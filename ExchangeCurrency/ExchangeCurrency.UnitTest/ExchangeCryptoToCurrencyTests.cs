@@ -12,11 +12,7 @@ namespace ExchangeCurrency.UnitTest
     {
         private static List<CurrencyModel> currencies = new List<CurrencyModel>
             {
-                new CurrencyModel
-                {
-                    Name="testXCV",
-                    Symbol="xcv"
-                }
+                new CurrencyModel("testXCV","xcv")
             };
         public FakeInputCurreny(): base(currencies)
         {
@@ -27,16 +23,8 @@ namespace ExchangeCurrency.UnitTest
     {
         private static List<CurrencyModel> currencies = new List<CurrencyModel>
             {
-                new CurrencyModel
-                {
-                    Name="test1",
-                    Symbol="tt1"
-                },
-                new CurrencyModel
-                {
-                    Name="test2",
-                    Symbol="tt2"
-                }
+                new CurrencyModel("test1","tt1"),
+                new CurrencyModel("test2","tt2")
             };
         public FakeOutputCurrency() : base(currencies)
         {
