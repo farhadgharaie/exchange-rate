@@ -1,6 +1,7 @@
 ﻿using Exchange.Common.interfaces;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Exchange.Service
 {
@@ -22,12 +23,8 @@ namespace Exchange.Service
                 throw new Exception("Symbol not found");
             }
 
-            var result = _cryptoExchange.ExchangeToTraditional(cryptoSymbol, traditionalCurrency);
-            return result;
-        }
-        private double USDQuote(string cryptoSymbol)
-        {
-            return 1;
+            var result = Task.FromResult(_cryptoExchange.GetExchangeToTraditionalAsync(cryptoSymbol, traditionalCurrency));
+            return result.Result.Result;
         }
     }
 

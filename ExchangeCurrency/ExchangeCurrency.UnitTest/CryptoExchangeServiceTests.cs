@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
+using System.Threading.Tasks;
 
 namespace ExchangeCurrency.UnitTest
 {
@@ -56,12 +57,12 @@ namespace ExchangeCurrency.UnitTest
               .Returns(new FakeOutputCurrency().getAll());
 
 
-            cryptoExchangeMoq.Setup(a => a.ExchangeToTraditional(It.IsAny<string>(), convertToStub.Object))
-                .Returns(new Dictionary<string, double>()
+            cryptoExchangeMoq.Setup(a => a.GetExchangeToTraditionalAsync(It.IsAny<string>(), convertToStub.Object))
+                .Returns(Task.FromResult(new Dictionary<string, double>()
                                         {
                                             { "tt2",1},
                                             { "tt1",1}
-                                        });
+                                        }));
 
             //Act
             var actual = new CryptoExchangeService(inputStub.Object, cryptoExchangeMoq.Object)
@@ -83,8 +84,8 @@ namespace ExchangeCurrency.UnitTest
             inputStub.Setup(a => a.IsSymbolExist(It.IsAny<string>()))
                .Returns(false);
 
-            cryptoExchangeMoq.Setup(a => a.ExchangeToTraditional(cryptoCurrency, convertToStub.Object))
-                .Returns(It.IsAny<Dictionary<string,double>>());
+            cryptoExchangeMoq.Setup(a => a.GetExchangeToTraditionalAsync(cryptoCurrency, convertToStub.Object))
+                .Returns(Task.FromResult(It.IsAny<Dictionary<string,double>>()));
 
             //Act
             Action act = () => new CryptoExchangeService(inputStub.Object, cryptoExchangeMoq.Object)
