@@ -1,10 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Xunit;
 
 namespace ExchangeCurrency.UnitTest
 {
-    class CryptoExchangeTests
+    public class CryptoExchangeTests
     {
+        [Fact]
+        public void dd()
+        {
+
+        }
     }
 }

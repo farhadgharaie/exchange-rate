@@ -33,7 +33,7 @@ namespace ExchangeCurrency.UnitTest
 
         }
     }
-    public class ExchangeCryptoToCurrencyTests
+    public class CryptoExchangeServiceTests
     {
         private readonly Mock<ICurrency> convertToStub = new Mock<ICurrency>();
         private readonly Mock<ICurrency> inputStub = new Mock<ICurrency>();
