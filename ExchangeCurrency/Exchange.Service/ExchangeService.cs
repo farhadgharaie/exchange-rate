@@ -1,6 +1,7 @@
 ﻿using Exchange.Common.interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Exchange.Service
@@ -8,25 +9,53 @@ namespace Exchange.Service
     public class CryptoExchangeService
     {
         private readonly ICurrency _cryptoCurrencies;
-        private readonly ICryptoExchange _cryptoExchange;
+        private readonly ICryptoToUSD _cryptoToUSD;
+        private readonly IExchangeBaseOnUSD _exchangeBaseOnUSD;
         public CryptoExchangeService(ICurrency cryptoCurrencies,
-            ICryptoExchange cryptoExchange)
+                                     ICryptoToUSD cryptoToUsD,
+                                     IExchangeBaseOnUSD exchangeBaseOnUSD
+            )
         {
             _cryptoCurrencies = cryptoCurrencies;
-            _cryptoExchange = cryptoExchange;
+            _cryptoToUSD = cryptoToUsD;
+            _exchangeBaseOnUSD = exchangeBaseOnUSD;
         }
-        
-        public Dictionary<string, double> ToTraditional(string cryptoSymbol, ICurrency traditionalCurrency )
+
+        public async Task<Dictionary<string, double>> ToTraditional(string cryptoSymbol, ICurrency traditionalCurrency)
         {
             if (!_cryptoCurrencies.IsSymbolExist(cryptoSymbol))
             {
                 throw new Exception("Symbol not found");
             }
 
-            var result = Task.FromResult(_cryptoExchange.GetExchangeToTraditionalAsync(cryptoSymbol, traditionalCurrency));
-            return result.Result.Result;
-        }
-    }
+            var uSD = await GetUSDQuote(cryptoSymbol);
 
-    
+            var result = await ExchangeFromUSDToTraditional(uSD, traditionalCurrency);
+
+            return result;
+        }
+
+        private async Task<double> GetUSDQuote(string symbol)
+        {
+            var result = await _cryptoToUSD.GetUSDQuoteAsync(symbol);
+            if (result == 0)
+            {
+                throw new Exception("No USD base quote provided");
+            }
+            return result;
+        }
+        private async Task<Dictionary<string, double>> ExchangeFromUSDToTraditional(double uSDrate, ICurrency traditionalCurrency)
+        {
+            string[] exchangeTo = traditionalCurrency.getAll().Select(a => a.Symbol).ToArray();
+
+            var exchangerate = await _exchangeBaseOnUSD.ExchangeBaseOnUSD(exchangeTo);
+            var result = new Dictionary<string, double>();
+            foreach (var rate in exchangerate)
+            {
+                result.Add(rate.Key, rate.Value * uSDrate);
+            }
+            return result;
+        }
+
+    }
 }

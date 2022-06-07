@@ -1,4 +1,5 @@
-﻿using Polly;
+﻿using Exchange.Common.interfaces;
+using Polly;
 using Polly.Retry;
 using RestSharp;
 using System;
@@ -18,7 +19,7 @@ namespace CryptoExchange.ACL.ExchangeRates
         public string date { get; set; }
         public string rates { get; set; }
     }
-    public class ExchangeRatesAPI
+    public class ExchangeRatesAPI: IExchangeBaseOnUSD
     {
         private readonly RestClient _client;
         const string APIKey = @"dh6Px535GT55YKup86G5MYRCJbb2X5RN";
@@ -30,7 +31,6 @@ namespace CryptoExchange.ACL.ExchangeRates
             _client = new RestClient(@"https://api.exchangeratesapi.io/");
             _retryPolicy = Policy
                 .HandleResult<RestResponse>(a => a.StatusCode == HttpStatusCode.TooManyRequests)
-               // .CircuitBreakerAsync(4, TimeSpan.FromSeconds(60))
                 .WaitAndRetryAsync(
                    retryCount: MAX_RETRIES,
                    sleepDurationProvider: _ => TimeSpan.FromSeconds(1),
@@ -39,7 +39,7 @@ namespace CryptoExchange.ACL.ExchangeRates
                        //Log($"Too many requests. Retrying in {sleepDuration}. {attemptNumber} / {MAX_RETRIES}");
                    });
         }
-        public async Task<Dictionary<string, double>> Exchange(double uSDRate, string[] exchangeTo)
+        public async Task<Dictionary<string, double>> ExchangeBaseOnUSD(string[] exchangeTo)
         {
             var request = new RestRequest("v1/latest", Method.Get);
             request.AddQueryParameter("access_key ", APIKey);

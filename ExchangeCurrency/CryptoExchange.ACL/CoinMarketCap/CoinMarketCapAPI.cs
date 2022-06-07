@@ -1,4 +1,5 @@
 ﻿using CryptoExchange.ACL.CoinMarketCapModel;
+using Exchange.Common.interfaces;
 using Polly;
 using Polly.Retry;
 using RestSharp;
@@ -9,7 +10,8 @@ using System.Threading.Tasks;
 
 namespace CryptoExchange.ACL.CoinMarketCap
 {
-    public class CoinMarketCapAPI
+    
+    public class CoinMarketCapAPI : ICryptoToUSD
     {
         private readonly RestClient _client;
         const string APIKey = @"bd820c50-a4a4-4b76-8b23-a78d07a2ed85";
