@@ -51,7 +51,7 @@ namespace CryptoExchange.ACL.ExchangeRates
                 var res = await _client.ExecuteGetAsync(request);
                 if (!res.IsSuccessful)
                 {
-                    throw new Exception(res.ErrorMessage);
+                    throw new Exception("Service is unavailable.");
                 }
                 return res;
             });

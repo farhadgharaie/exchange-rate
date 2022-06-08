@@ -11,4 +11,12 @@ namespace Exchange.Common.interfaces
         bool IsSymbolExist(string symbol);
 
     }
+    public interface ICryptoCurrency : ICurrency
+    {
+
+    }
+    public interface ITraditionalCurrency : ICurrency
+    {
+
+    }
 }

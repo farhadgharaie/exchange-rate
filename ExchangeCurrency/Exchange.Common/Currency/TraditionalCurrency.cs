@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using Exchange.Common.interfaces;
+using System.Collections.Generic;
 
 namespace Exchange.Common.Currency
 {
-    public class TraditionalCurrency : Currency
+    public class TraditionalCurrency : Currency, ITraditionalCurrency
     {
         private static List<CurrencyModel> currencies = new List<CurrencyModel>
         {

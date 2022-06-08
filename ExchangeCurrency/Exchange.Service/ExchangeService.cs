@@ -8,10 +8,10 @@ namespace Exchange.Service
 {
     public class CryptoExchangeService
     {
-        private readonly ICurrency _cryptoCurrencies;
+        private readonly ICryptoCurrency _cryptoCurrencies;
         private readonly ICryptoToUSD _cryptoToUSD;
         private readonly IExchangeBaseOnUSD _exchangeBaseOnUSD;
-        public CryptoExchangeService(ICurrency cryptoCurrencies,
+        public CryptoExchangeService(ICryptoCurrency cryptoCurrencies,
                                      ICryptoToUSD cryptoToUsD,
                                      IExchangeBaseOnUSD exchangeBaseOnUSD
             )
@@ -21,7 +21,7 @@ namespace Exchange.Service
             _exchangeBaseOnUSD = exchangeBaseOnUSD;
         }
 
-        public async Task<Dictionary<string, double>> ToTraditional(string cryptoSymbol, ICurrency traditionalCurrency)
+        public async Task<Dictionary<string, double>> ToTraditional(string cryptoSymbol, ITraditionalCurrency traditionalCurrency)
         {
             if (!_cryptoCurrencies.IsSymbolExist(cryptoSymbol))
             {
@@ -44,7 +44,7 @@ namespace Exchange.Service
             }
             return result;
         }
-        private async Task<Dictionary<string, double>> ExchangeFromUSDToTraditional(double uSDrate, ICurrency traditionalCurrency)
+        private async Task<Dictionary<string, double>> ExchangeFromUSDToTraditional(double uSDrate, ITraditionalCurrency traditionalCurrency)
         {
             string[] exchangeTo = traditionalCurrency.getAll().Select(a => a.Symbol).ToArray();
 

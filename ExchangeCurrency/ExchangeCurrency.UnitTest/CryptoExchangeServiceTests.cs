@@ -25,8 +25,8 @@ namespace ExchangeCurrency.UnitTest
     }
     public class CryptoExchangeServiceTests
     {
-        private readonly Mock<ICurrency> convertToStub = new Mock<ICurrency>();
-        private readonly Mock<ICurrency> inputStub = new Mock<ICurrency>();
+        private readonly Mock<ITraditionalCurrency> convertToStub = new Mock<ITraditionalCurrency>();
+        private readonly Mock<ICryptoCurrency> inputStub = new Mock<ICryptoCurrency>();
         private readonly Mock<ICryptoToUSD> cryptoToUSDMoq = new Mock<ICryptoToUSD>();
         private readonly Mock<IExchangeBaseOnUSD> exchangeBaseOnUSDMoq = new Mock<IExchangeBaseOnUSD>();
         [Fact]
