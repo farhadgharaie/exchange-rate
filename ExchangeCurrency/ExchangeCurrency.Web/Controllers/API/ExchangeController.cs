@@ -39,7 +39,7 @@ namespace ExchangeCurrency.Web.Controllers.API
                 }
                 // new Dictionary<string, double>() { { "USD", 122 }, { "GBP", 12442 } }; //
                 Dictionary<string, double> CurrencyQuotes;
-                CurrencyQuotes =  new Dictionary<string, double>() { { "USD", 122 }, { "GBP", 12442 } }; //await _cryptoExchangeService.ToTraditional(symbol, new TraditionalCurrency());
+                CurrencyQuotes = await _cryptoExchangeService.ToTraditional(symbol, new TraditionalCurrency());
                 return Ok(CurrencyQuotes);
             }
             catch(SymbolNotFoundException ex)

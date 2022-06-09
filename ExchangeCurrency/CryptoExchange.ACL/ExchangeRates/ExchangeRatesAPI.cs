@@ -1,4 +1,5 @@
-﻿using Exchange.Common.CustomException;
+﻿using CryptoExchange.ACL.ExchangeRates.ExchnageRatesModel;
+using Exchange.Common.CustomException;
 using Exchange.Common.interfaces;
 using Polly;
 using Polly.Retry;
@@ -12,14 +13,6 @@ using System.Threading.Tasks;
 
 namespace CryptoExchange.ACL.ExchangeRates
 {
-    public class Root
-    {
-        public bool success { get; set; }
-        public int timestamp { get; set; }
-        public string @base { get; set; }
-        public string date { get; set; }
-        public string rates { get; set; }
-    }
     public class ExchangeRatesAPI: IExchangeBaseOnUSD
     {
         private readonly RestClient _client;
@@ -29,7 +22,7 @@ namespace CryptoExchange.ACL.ExchangeRates
 
         public ExchangeRatesAPI()
         {
-            _client = new RestClient(@"https://api.exchangeratesapi.io/");
+            _client = new RestClient(@"https://api.apilayer.com/");
             _retryPolicy = Policy
                 .HandleResult<RestResponse>(a => a.StatusCode == HttpStatusCode.TooManyRequests)
                 .WaitAndRetryAsync(
@@ -42,8 +35,8 @@ namespace CryptoExchange.ACL.ExchangeRates
         }
         public async Task<Dictionary<string, double>> ExchangeBaseOnUSD(string[] exchangeTo)
         {
-            var request = new RestRequest("v1/latest", Method.Get);
-            request.AddQueryParameter("access_key ", APIKey);
+            var request = new RestRequest("exchangerates_data/latest", Method.Get);
+            request.AddQueryParameter("apikey", APIKey);
             request.AddQueryParameter("base", "USD");
             request.AddQueryParameter("symbols", string.Join(",",exchangeTo));
 
@@ -52,20 +45,18 @@ namespace CryptoExchange.ACL.ExchangeRates
                 var res = await _client.ExecuteGetAsync(request);
                 if (!res.IsSuccessful)
                 {
-                    throw new ServiceUnavailableException();
+                    throw new ThirdPartyAPIServiceUnavailableException();
                 }
                 return res;
             });
             var result = new Dictionary<string, double>();
-            var data = JsonSerializer.Deserialize<Root>(respone.Content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var data = JsonSerializer.Deserialize<ExchangeRateAPIResponse>(respone.Content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             if (data.success)
             {
-                var rates=data.rates.Split(',');
+                var rates=data.rates;
                 foreach (var rate in rates)
                 {
-                    var rateArray = rate.Split(':');
-                    double.TryParse(rateArray[1], out double number);
-                    result.Add(rateArray[0], number);
+                    result.Add(rate.Key, rate.Value);
                 }
             }
 

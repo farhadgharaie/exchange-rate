@@ -39,9 +39,9 @@ namespace Exchange.Service
         private async Task<double> GetUSDQuote(string symbol)
         {
             var result = await _cryptoToUSD.GetUSDQuoteAsync(symbol);
-            if (result == 0)
+            if (result <= 0)
             {
-                throw new Exception("No USD base quote provided");
+                throw new NoUSDBaseQuoteProvidedException();
             }
             return result;
         }
@@ -53,7 +53,7 @@ namespace Exchange.Service
             var result = new Dictionary<string, double>();
             foreach (var rate in exchangerate)
             {
-                result.Add(rate.Key, rate.Value * uSDrate);
+                result.Add(rate.Key,Math.Round( rate.Value * uSDrate,2));
             }
             return result;
         }

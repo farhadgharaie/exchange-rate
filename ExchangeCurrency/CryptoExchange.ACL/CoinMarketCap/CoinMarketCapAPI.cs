@@ -45,7 +45,7 @@ namespace CryptoExchange.ACL.CoinMarketCap
                 var res = await _client.ExecuteGetAsync(request);
                 if (!res.IsSuccessful)
                 {
-                    throw new ServiceUnavailableException();
+                    throw new ThirdPartyAPIServiceUnavailableException();
                 }
                 return res;
             });

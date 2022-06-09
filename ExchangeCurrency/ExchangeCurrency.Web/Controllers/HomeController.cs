@@ -40,7 +40,7 @@ namespace ExchangeCurrency.Web.Controllers
 
                     var readTask = await result.Content.ReadAsStringAsync();
                     //readTask.Wait();
-                    CurrencyQuotes = JsonSerializer.Deserialize<Dictionary<string, double>>(readTask);
+                    CurrencyQuotes = JsonSerializer.Deserialize<Dictionary<string,double>>(readTask);
                     exchangeCurrencyModel.Symbol = cryptoSymbol.ToUpper();
                     exchangeCurrencyModel.LastUpdateDate = DateTime.Now;
                     exchangeCurrencyModel.Exchange = CurrencyQuotes;
