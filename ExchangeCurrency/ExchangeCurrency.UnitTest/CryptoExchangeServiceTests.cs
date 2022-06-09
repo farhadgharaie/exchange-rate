@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 using System.Threading.Tasks;
+using Exchange.Common.CustomException;
 
 namespace ExchangeCurrency.UnitTest
 {
@@ -114,7 +115,7 @@ namespace ExchangeCurrency.UnitTest
                                 .ToTraditional(cryptoCurrency, convertToStub.Object);
 
             //Assert
-            await act.Should().ThrowAsync<Exception>().WithMessage("Symbol not found");
+            await act.Should().ThrowAsync<SymbolNotFoundException>();
         }
     }
 }

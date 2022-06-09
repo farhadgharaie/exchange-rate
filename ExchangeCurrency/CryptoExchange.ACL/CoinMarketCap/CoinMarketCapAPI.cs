@@ -1,4 +1,5 @@
 ﻿using CryptoExchange.ACL.CoinMarketCapModel;
+using Exchange.Common.CustomException;
 using Exchange.Common.interfaces;
 using Polly;
 using Polly.Retry;
@@ -44,7 +45,7 @@ namespace CryptoExchange.ACL.CoinMarketCap
                 var res = await _client.ExecuteGetAsync(request);
                 if (!res.IsSuccessful)
                 {
-                    throw new Exception("Service is unavailable.");
+                    throw new ServiceUnavailableException();
                 }
                 return res;
             });

@@ -1,4 +1,5 @@
-﻿using Exchange.Common.interfaces;
+﻿using Exchange.Common.CustomException;
+using Exchange.Common.interfaces;
 using Polly;
 using Polly.Retry;
 using RestSharp;
@@ -51,7 +52,7 @@ namespace CryptoExchange.ACL.ExchangeRates
                 var res = await _client.ExecuteGetAsync(request);
                 if (!res.IsSuccessful)
                 {
-                    throw new Exception("Service is unavailable.");
+                    throw new ServiceUnavailableException();
                 }
                 return res;
             });

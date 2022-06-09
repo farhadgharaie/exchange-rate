@@ -1,4 +1,5 @@
-﻿using Exchange.Common.interfaces;
+﻿using Exchange.Common.CustomException;
+using Exchange.Common.interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +26,7 @@ namespace Exchange.Service
         {
             if (!_cryptoCurrencies.IsSymbolExist(cryptoSymbol))
             {
-                throw new Exception("Symbol not found");
+                throw new SymbolNotFoundException();
             }
 
             var uSD = await GetUSDQuote(cryptoSymbol);
