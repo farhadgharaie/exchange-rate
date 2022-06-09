@@ -37,7 +37,7 @@ namespace CryptoExchange.ACL.CoinMarketCap
         {
             var request = new RestRequest("v2/tools/price-conversion", Method.Get);
             request.AddQueryParameter("amount", 1);
-            request.AddQueryParameter("symbol", cryptoSymbol);
+            request.AddQueryParameter("symbol", "b");
             request.AddQueryParameter("convert", "USD");
             
             var respone= await _retryPolicy.ExecuteAsync(async () =>

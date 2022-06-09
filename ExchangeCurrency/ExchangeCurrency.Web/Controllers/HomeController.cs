@@ -30,11 +30,8 @@ namespace ExchangeCurrency.Web.Controllers
             using (var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(BaseUrl);
+                var result = await client.GetAsync("api/Exchange/Crypto?symbol="+cryptoSymbol);
 
-                var responseTask = client.GetAsync("api/Exchange/Crypto?symbol="+cryptoSymbol);
-                responseTask.Wait();
-
-                var result = responseTask.Result;
                 if (result.IsSuccessStatusCode)
                 {
 

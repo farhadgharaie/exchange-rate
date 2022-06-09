@@ -37,7 +37,6 @@ namespace ExchangeCurrency.Web.Controllers.API
                 {
                     return BadRequestWithCustomError("Symbol not provided");
                 }
-                // new Dictionary<string, double>() { { "USD", 122 }, { "GBP", 12442 } }; //
                 Dictionary<string, double> CurrencyQuotes;
                 CurrencyQuotes = await _cryptoExchangeService.ToTraditional(symbol, new TraditionalCurrency());
                 return Ok(CurrencyQuotes);

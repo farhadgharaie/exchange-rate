@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace CryptoExchange.ACL.ExchangeRates
 {
+   
     public class ExchangeRatesAPI: IExchangeBaseOnUSD
     {
         private readonly RestClient _client;

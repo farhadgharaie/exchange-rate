@@ -19,7 +19,7 @@ namespace Exchange.Common.Currency
 
         public bool IsSymbolExist(string symbol)
         {
-            return _currencies.Any(a => a.Symbol.Contains(symbol, StringComparison.OrdinalIgnoreCase));
+            return _currencies.Any(a => a.Symbol.Equals(symbol, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

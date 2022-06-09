@@ -89,7 +89,7 @@ namespace ExchangeCurrency.UnitTest
                                 .ToTraditional(cryptoCurrency, convertToStub.Object);
 
             //Assert
-            await act.Should().ThrowAsync<Exception>().WithMessage("No USD base quote provided");
+            await act.Should().ThrowAsync<NoUSDBaseQuoteProvidedException>();
         }
         [Fact]
         public async Task ExchangeCryptoToTraditional_WithWrongCrypto_ReturenBaseNotFoundException()
