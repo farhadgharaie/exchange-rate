@@ -33,10 +33,6 @@ namespace ExchangeCurrency.Web.Controllers.API
         {
             try
             {
-                if (string.IsNullOrEmpty(symbol))
-                {
-                    return BadRequestWithCustomError("Symbol not provided");
-                }
                 Dictionary<string, double> CurrencyQuotes;
                 CurrencyQuotes = await _cryptoExchangeService.ToTraditional(symbol, new TraditionalCurrency());
                 return Ok(CurrencyQuotes);
@@ -48,7 +44,6 @@ namespace ExchangeCurrency.Web.Controllers.API
             catch(ServiceUnavailableException)
             {
                 return BadRequestWithCustomError("Service is unavailable");
-                 
             }
             catch (Exception)
             {

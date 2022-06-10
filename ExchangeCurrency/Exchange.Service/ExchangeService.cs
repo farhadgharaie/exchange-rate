@@ -24,16 +24,25 @@ namespace Exchange.Service
 
         public async Task<Dictionary<string, double>> ToTraditional(string cryptoSymbol, ITraditionalCurrency traditionalCurrency)
         {
-            if (!_cryptoCurrencies.IsSymbolExist(cryptoSymbol))
-            {
-                throw new SymbolNotFoundException();
-            }
+            InputValidation(cryptoSymbol);
 
             var uSD = await GetUSDQuote(cryptoSymbol);
 
             var result = await ExchangeFromUSDToTraditional(uSD, traditionalCurrency);
 
             return result;
+        }
+
+        private void InputValidation(string cryptoSymbol)
+        {
+            if (string.IsNullOrEmpty(cryptoSymbol))
+            {
+                throw new SymbolNotProvidedException();
+            }
+            if (!_cryptoCurrencies.IsSymbolExist(cryptoSymbol))
+            {
+                throw new SymbolNotFoundException();
+            }
         }
 
         private async Task<double> GetUSDQuote(string symbol)
