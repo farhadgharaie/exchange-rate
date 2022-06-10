@@ -1,4 +1,5 @@
 ﻿using CryptoExchange.ACL.ExchangeRates.ExchnageRatesModel;
+using Exchange.Common.Config;
 using Exchange.Common.CustomException;
 using Exchange.Common.interfaces;
 using Polly;
@@ -17,17 +18,19 @@ namespace CryptoExchange.ACL.ExchangeRates
     public class ExchangeRatesAPI: IExchangeBaseOnUSD
     {
         private readonly RestClient _client;
-        const string APIKey = @"dh6Px535GT55YKup86G5MYRCJbb2X5RN";
-        const int MAX_RETRIES = 3;
+        private int _maxRetries ;
         private readonly AsyncRetryPolicy<RestResponse> _retryPolicy;
+        private readonly APIConfiguration _config;
 
-        public ExchangeRatesAPI()
+        public ExchangeRatesAPI(APIConfiguration config)
         {
-            _client = new RestClient(@"https://api.apilayer.com/");
+            _config = config;
+            _client = new RestClient(_config.URL);
+            _maxRetries = _config.MaximumRetries;
             _retryPolicy = Policy
                 .HandleResult<RestResponse>(a => a.StatusCode == HttpStatusCode.TooManyRequests)
                 .WaitAndRetryAsync(
-                   retryCount: MAX_RETRIES,
+                   retryCount: _maxRetries,
                    sleepDurationProvider: _ => TimeSpan.FromSeconds(1),
                    onRetry: (exception, sleepDuration, attemptNumber, context) =>
                    {
@@ -37,7 +40,7 @@ namespace CryptoExchange.ACL.ExchangeRates
         public async Task<Dictionary<string, double>> ExchangeBaseOnUSD(string[] exchangeTo)
         {
             var request = new RestRequest("exchangerates_data/latest", Method.Get);
-            request.AddQueryParameter("apikey", APIKey);
+            request.AddQueryParameter("apikey", _config.ApiKey);
             request.AddQueryParameter("base", "USD");
             request.AddQueryParameter("symbols", string.Join(",",exchangeTo));
 

@@ -1,4 +1,5 @@
 ﻿using CryptoExchange.ACL.CoinMarketCapModel;
+using Exchange.Common.Config;
 using Exchange.Common.CustomException;
 using Exchange.Common.interfaces;
 using Polly;
@@ -11,22 +12,23 @@ using System.Threading.Tasks;
 
 namespace CryptoExchange.ACL.CoinMarketCap
 {
-    
     public class CoinMarketCapAPI : ICryptoToUSD
     {
         private readonly RestClient _client;
-        const string APIKey = @"bd820c50-a4a4-4b76-8b23-a78d07a2ed85";
-        const int MAX_RETRIES = 3;
+        private int _maxRetries ;
         private readonly AsyncRetryPolicy<RestResponse> _retryPolicy;
-    
-        public CoinMarketCapAPI()
+        private readonly APIConfiguration _config;
+
+        public CoinMarketCapAPI(APIConfiguration config)
         {
-            _client = new RestClient(@"https://pro-api.coinmarketcap.com/");
-            _client.AddDefaultHeader("X-CMC_PRO_API_KEY", APIKey);
+            _config = config;
+            _maxRetries = _config.MaximumRetries;
+            _client = new RestClient(_config.URL);
+            _client.AddDefaultHeader("X-CMC_PRO_API_KEY", _config.ApiKey);
             _retryPolicy = Policy
                 .HandleResult<RestResponse>(a => a.StatusCode == HttpStatusCode.TooManyRequests)
                 .WaitAndRetryAsync(
-                   retryCount: MAX_RETRIES,
+                   retryCount: _maxRetries,
                    sleepDurationProvider: _ => TimeSpan.FromSeconds(1),
                    onRetry: (exception, sleepDuration, attemptNumber, context) =>
                    {

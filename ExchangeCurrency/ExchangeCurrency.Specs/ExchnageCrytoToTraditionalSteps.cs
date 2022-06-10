@@ -1,4 +1,5 @@
-﻿using Exchange.Common.interfaces;
+﻿using Exchange.Common.Config;
+using Exchange.Common.interfaces;
 using ExchangeCurrency.Specs.Fakes;
 using ExchangeCurrency.Specs.Setup;
 using ExchangeCurrency.Web;
@@ -15,7 +16,12 @@ using Xunit;
 namespace ExchangeCurrency.Specs
 {
    
-    
+    public class FakeConfig
+    {
+        public string URL { get; set; } = "test";
+        public string ApiKey { get; set; } = "test";
+        public int MaximumRetries { get; set; } = 3;
+    }
     [Binding]
     public class ExchnageCrytoToTraditionalSteps : IClassFixture<CustomWebApplicationFactory<Startup>>
     {

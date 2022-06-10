@@ -17,7 +17,6 @@ namespace ExchangeCurrency.Specs.Setup
                 using (var scope = sp.CreateScope())
                 {
                     var scopedServices = scope.ServiceProvider;
-
                 }
             });
         }
