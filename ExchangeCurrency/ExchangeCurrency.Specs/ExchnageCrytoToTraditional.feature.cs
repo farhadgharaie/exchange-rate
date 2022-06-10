@@ -80,16 +80,16 @@ namespace ExchangeCurrency.Specs
             this.TestTearDown();
         }
         
-        [Xunit.SkippableTheoryAttribute(DisplayName="Show BTC Cryptocurrency exchangerate")]
+        [Xunit.SkippableTheoryAttribute(DisplayName="Show Cryptocurrency exchangerate")]
         [Xunit.TraitAttribute("FeatureTitle", "ExchnageCrytoToTraditional")]
-        [Xunit.TraitAttribute("Description", "Show BTC Cryptocurrency exchangerate")]
+        [Xunit.TraitAttribute("Description", "Show Cryptocurrency exchangerate")]
         [Xunit.TraitAttribute("Category", "mytag")]
         [Xunit.InlineDataAttribute("USD", new string[0])]
         [Xunit.InlineDataAttribute("EUR", new string[0])]
         [Xunit.InlineDataAttribute("BRL", new string[0])]
         [Xunit.InlineDataAttribute("GBP", new string[0])]
         [Xunit.InlineDataAttribute("AUD", new string[0])]
-        public void ShowBTCCryptocurrencyExchangerate(string currency, string[] exampleTags)
+        public void ShowCryptocurrencyExchangerate(string currency, string[] exampleTags)
         {
             string[] @__tags = new string[] {
                     "mytag"};
@@ -100,7 +100,7 @@ namespace ExchangeCurrency.Specs
             string[] tagsOfScenario = @__tags;
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             argumentsOfScenario.Add("Currency", currency);
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Show BTC Cryptocurrency exchangerate", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Show Cryptocurrency exchangerate", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 5
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
