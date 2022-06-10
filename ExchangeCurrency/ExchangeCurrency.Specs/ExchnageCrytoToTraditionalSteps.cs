@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 using Xunit;
@@ -47,13 +48,14 @@ namespace ExchangeCurrency.Specs
         {
             string url = ("/api/exchange/crypto?symbol="+symbol);
             var response = await _client.GetAsync(url);
-            content=response.Content.ReadAsStringAsync().Result.ToLower();
+            content=response.Content.ReadAsStringAsync().Result;
         }
 
         [Then(@"the result should be (.*) in screen")]
-        public void  ThenTheResultShouldBeInScreen(string p0)
+        public void  ThenTheResultShouldBeInScreen(string currency)
         {
-            var actual = content.ToLower().Contains(p0.ToLower());
+            var data = JsonSerializer.Deserialize<Dictionary<string,double>>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var actual = data.ContainsKey(currency);
             actual.Should().BeTrue();
         }
     }
