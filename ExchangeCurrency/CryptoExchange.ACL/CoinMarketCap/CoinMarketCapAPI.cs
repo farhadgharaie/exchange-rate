@@ -17,9 +17,9 @@ namespace CryptoExchange.ACL.CoinMarketCap
         private readonly RestClient _client;
         private int _maxRetries ;
         private readonly AsyncRetryPolicy<RestResponse> _retryPolicy;
-        private readonly APIConfiguration _config;
+        private readonly ThirdPartAPIConfig _config;
 
-        public CoinMarketCapAPI(APIConfiguration config)
+        public CoinMarketCapAPI(ThirdPartAPIConfig config)
         {
             _config = config;
             _maxRetries = _config.MaximumRetries;

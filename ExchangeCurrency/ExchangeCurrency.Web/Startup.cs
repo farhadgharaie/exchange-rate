@@ -15,17 +15,6 @@ using System.Reflection;
 
 namespace ExchangeCurrency.Web
 {
-    public class Root
-    {
-        public List<APIConfig> APIConfig { get; set; }
-    }
-    public class APIConfig
-    {
-        public string Name { get; set; }
-        public string URL { get; set; }
-        public int MaximumRetry { get; set; }
-    }
-
     public class Startup
     {
         public Startup(IConfiguration configuration, IWebHostEnvironment env)
@@ -33,32 +22,28 @@ namespace ExchangeCurrency.Web
             var builder = new ConfigurationBuilder()
            .SetBasePath(env.ContentRootPath)
            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-           .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
            .AddEnvironmentVariables();
-            if (env.IsEnvironment("Development"))
+            if (env.IsDevelopment())
             {
                 builder.AddUserSecrets(Assembly.GetExecutingAssembly());
             }
-            var NN = env.EnvironmentName;
             Configuration = builder.Build();
-            Configuration = configuration;
         }
 
         public IConfiguration Configuration { get; }
         private APIConfig[] apiConfigs; 
 
-        private APIConfiguration GetAPIConfiguration(string name)
+        private ThirdPartAPIConfig GetAPIConfiguration(string name)
         {
             foreach (var config in apiConfigs)
             {
                 if (config.Name.ToLower() == name.ToLower())
                 {
-                    return new APIConfiguration(Configuration[config.Name+"ApiKey"], config.URL, config.MaximumRetry);
+                    return new ThirdPartAPIConfig(Configuration[config.Name+"ApiKey"], config.URL, config.MaximumRetry);
                 }
             }
-            return new APIConfiguration("","");
+            return new ThirdPartAPIConfig("","");
         }
-        // This method gets called by the runtime. Use this method to add services to the container.
         public virtual void ConfigureServices(IServiceCollection services)
         {
             apiConfigs = Configuration.GetSection("APIConfig").Get<APIConfig[]>();
@@ -77,7 +62,6 @@ namespace ExchangeCurrency.Web
             services.AddSingleton<IExchangeBaseOnUSD>(new ExchangeRatesAPI(exchnageRateConfig));
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -87,7 +71,6 @@ namespace ExchangeCurrency.Web
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
             app.UseHttpsRedirection();

@@ -20,9 +20,9 @@ namespace CryptoExchange.ACL.ExchangeRates
         private readonly RestClient _client;
         private int _maxRetries ;
         private readonly AsyncRetryPolicy<RestResponse> _retryPolicy;
-        private readonly APIConfiguration _config;
+        private readonly ThirdPartAPIConfig _config;
 
-        public ExchangeRatesAPI(APIConfiguration config)
+        public ExchangeRatesAPI(ThirdPartAPIConfig config)
         {
             _config = config;
             _client = new RestClient(_config.URL);
