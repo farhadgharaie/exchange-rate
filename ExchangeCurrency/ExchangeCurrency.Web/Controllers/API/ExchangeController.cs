@@ -45,13 +45,15 @@ namespace ExchangeCurrency.Web.Controllers.API
             {
                 return BadRequestWithCustomError("Service is unavailable");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex,ex.Message);
                 return new ContentResult() { Content = "Server error", StatusCode = (int)HttpStatusCode.InternalServerError };
             }
         }
         private ActionResult BadRequestWithCustomError(string error)
         {
+            _logger.LogError(error);
             Response.StatusCode = (int)HttpStatusCode.BadRequest;
             Response.HttpContext.Features.Get<IHttpResponseFeature>().ReasonPhrase = error;
             return BadRequest();
