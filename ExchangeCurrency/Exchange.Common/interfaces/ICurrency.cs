@@ -1,7 +1,5 @@
 ﻿using Exchange.Common.Currency;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Exchange.Common.interfaces
 {

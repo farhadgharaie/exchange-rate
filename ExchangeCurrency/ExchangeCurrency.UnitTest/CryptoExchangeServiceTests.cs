@@ -5,7 +5,6 @@ using FluentAssertions;
 using Moq;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Xunit;
 using System.Threading.Tasks;
 using Exchange.Common.CustomException;
