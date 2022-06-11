@@ -1,6 +1,7 @@
 ﻿using Exchange.Common.Currency;
 using Exchange.Common.CustomException;
 using Exchange.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,7 @@ using System.Threading.Tasks;
 
 namespace ExchangeCurrency.Web.Controllers.API
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ExchangeController : ControllerBase
@@ -27,9 +29,9 @@ namespace ExchangeCurrency.Web.Controllers.API
             _cryptoExchangeService = cryptoExchangeService;
 
         }
-        [Route("{symbol}")]
+        [Route("Crypto")]
         [HttpGet]
-        public async Task<ActionResult<Dictionary<string, double>>> Crypto([FromQuery] string symbol)
+        public async Task<ActionResult<Dictionary<string, double>>> Crypto([FromQuery]string symbol)
         {
             try
             {

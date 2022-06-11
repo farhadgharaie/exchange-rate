@@ -1,12 +1,8 @@
-﻿using Exchange.Common.Currency;
-using Exchange.Service;
-using ExchangeCurrency.Web.Models;
+﻿using ExchangeCurrency.Web.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -16,7 +12,7 @@ namespace ExchangeCurrency.Web.Controllers
     public class HomeController : Controller
     {
         private const string BaseUrl = "https://localhost:44357/";
-
+        private const string key = "pgH7QzFHJx4w46fI~5Uzi4RvtTwlEXp";
         public HomeController()
         {
            
@@ -29,6 +25,7 @@ namespace ExchangeCurrency.Web.Controllers
             { return View(); }
             using (var client = new HttpClient())
             {
+                client.DefaultRequestHeaders.Add("XApiKey", key);
                 client.BaseAddress = new Uri(BaseUrl);
                 var result = await client.GetAsync("api/Exchange/Crypto?symbol="+cryptoSymbol);
 
@@ -36,7 +33,6 @@ namespace ExchangeCurrency.Web.Controllers
                 {
 
                     var readTask = await result.Content.ReadAsStringAsync();
-                    //readTask.Wait();
                     CurrencyQuotes = JsonSerializer.Deserialize<Dictionary<string,double>>(readTask);
                     exchangeCurrencyModel.Symbol = cryptoSymbol.ToUpper();
                     exchangeCurrencyModel.LastUpdateDate = DateTime.Now;

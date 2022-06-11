@@ -1,9 +1,10 @@
-﻿using Exchange.Common.Config;
-using Exchange.Common.interfaces;
+﻿using Exchange.Common.interfaces;
 using ExchangeCurrency.Specs.Fakes;
 using ExchangeCurrency.Specs.Setup;
 using ExchangeCurrency.Web;
 using FluentAssertions;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
@@ -15,13 +16,7 @@ using Xunit;
 
 namespace ExchangeCurrency.Specs
 {
-   
-    public class FakeConfig
-    {
-        public string URL { get; set; } = "test";
-        public string ApiKey { get; set; } = "test";
-        public int MaximumRetries { get; set; } = 3;
-    }
+
     [Binding]
     public class ExchnageCrytoToTraditionalSteps : IClassFixture<CustomWebApplicationFactory<Startup>>
     {
@@ -38,10 +33,16 @@ namespace ExchangeCurrency.Specs
                 builder.ConfigureTestServices(service =>
                 {
                     service.AddScoped<ICryptoToUSD, FakeCryptotoUSD>();
-                    service.AddScoped<IExchangeBaseOnUSD, FakeExchangeBaseOnUSD>();
+                    service.AddScoped<IExchangeBaseOnUSD, FakeExchangeBaseOnUSD>(); 
+                    service.AddAuthentication("Test")
+                     .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
+                         "Test", options => { });
                 }
                 );
-            }). CreateClient();
+            }). CreateClient(new WebApplicationFactoryClientOptions
+            {
+                AllowAutoRedirect = false
+            });
         }
         [Given(@"the user entered BTC cryptocurrency symbol")]
         public void GivenTheUserEnteredBTCCryptocurrencySymbol()

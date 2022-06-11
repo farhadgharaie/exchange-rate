@@ -4,14 +4,13 @@ using Exchange.Common.Config;
 using Exchange.Common.Currency;
 using Exchange.Common.interfaces;
 using Exchange.Service;
+using ExchangeCurrency.Web.Handler;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 
 namespace ExchangeCurrency.Web
@@ -47,6 +46,8 @@ namespace ExchangeCurrency.Web
         }
         public virtual void ConfigureServices(IServiceCollection services)
         {
+            services.AddAuthentication("Custom")
+                .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>("Custom", null);
             apiConfigs = Configuration.GetSection("APIConfig").Get<APIConfig[]>();
             var coinMarketConfig = GetAPIConfiguration("CoinMarket");
             services.AddSingleton(coinMarketConfig);
@@ -68,7 +69,7 @@ namespace ExchangeCurrency.Web
                 {
                     Title = "Exchange Service API",
                     Version = "v1",
-                    Description = "Crypto Exchange Service"
+                    Description = "Crypto Exchange Service, Need ApiKey to use."
                 });
             });
         }
@@ -88,9 +89,10 @@ namespace ExchangeCurrency.Web
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.UseSwagger();
+            app.UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", "PlaceInfo Services"));
+            app.UseAuthentication();
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
@@ -98,8 +100,7 @@ namespace ExchangeCurrency.Web
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{cryptoSymbol?}");
             });
-            app.UseSwagger();
-            app.UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", "PlaceInfo Services"));
+            
         }
     }
 }
