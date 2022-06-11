@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -60,6 +61,16 @@ namespace ExchangeCurrency.Web
             services.AddSingleton<ICryptoCurrency>(new CryptoCurrency());
             services.AddSingleton<ICryptoToUSD>(new CoinMarketCapAPI(coinMarketConfig));
             services.AddSingleton<IExchangeBaseOnUSD>(new ExchangeRatesAPI(exchnageRateConfig));
+
+            services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Exchange Service API",
+                    Version = "v1",
+                    Description = "Crypto Exchange Service"
+                });
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -87,6 +98,8 @@ namespace ExchangeCurrency.Web
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{cryptoSymbol?}");
             });
+            app.UseSwagger();
+            app.UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", "PlaceInfo Services"));
         }
     }
 }
