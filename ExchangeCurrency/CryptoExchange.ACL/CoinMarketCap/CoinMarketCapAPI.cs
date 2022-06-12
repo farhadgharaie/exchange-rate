@@ -1,4 +1,5 @@
 ﻿using CryptoExchange.ACL.CoinMarketCapModel;
+using Exchange.Common.Authentication.interfaces;
 using Exchange.Common.Config;
 using Exchange.Common.CustomException;
 using Exchange.Common.interfaces;
@@ -17,14 +18,14 @@ namespace CryptoExchange.ACL.CoinMarketCap
         private readonly RestClient _client;
         private int _maxRetries ;
         private readonly AsyncRetryPolicy<RestResponse> _retryPolicy;
-        private readonly ThirdPartAPIConfig _config;
+        private readonly IThirdPartyConfiguration _config;
 
-        public CoinMarketCapAPI(ThirdPartAPIConfig config)
+        public CoinMarketCapAPI(IThirdPartyConfiguration config)
         {
             _config = config;
-            _maxRetries = _config.MaximumRetries;
-            _client = new RestClient(_config.URL);
-            _client.AddDefaultHeader("X-CMC_PRO_API_KEY", _config.ApiKey);
+            _maxRetries = _config.GetMaximumRetry();
+            _client = new RestClient(_config.GetURL());
+            _client.AddDefaultHeader("X-CMC_PRO_API_KEY", _config.GetAPIKey());
             _retryPolicy = Policy
                 .HandleResult<RestResponse>(a => a.StatusCode == HttpStatusCode.TooManyRequests)
                 .WaitAndRetryAsync(

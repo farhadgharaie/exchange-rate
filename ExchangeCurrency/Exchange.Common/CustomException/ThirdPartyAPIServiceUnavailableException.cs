@@ -2,7 +2,7 @@
 {
     public class ThirdPartyAPIServiceUnavailableException : ServiceUnavailableException
     {
-        public ThirdPartyAPIServiceUnavailableException() : base("3rd part service is unavailable")
+        public ThirdPartyAPIServiceUnavailableException() : base("3rd party service is unavailable")
         {
 
         }

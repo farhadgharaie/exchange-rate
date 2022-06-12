@@ -1,4 +1,5 @@
 ﻿using CryptoExchange.ACL.ExchangeRates.ExchangeRatesModel;
+using Exchange.Common.Authentication.interfaces;
 using Exchange.Common.Config;
 using Exchange.Common.CustomException;
 using Exchange.Common.interfaces;
@@ -20,13 +21,13 @@ namespace CryptoExchange.ACL.ExchangeRates
         private readonly RestClient _client;
         private int _maxRetries ;
         private readonly AsyncRetryPolicy<RestResponse> _retryPolicy;
-        private readonly ThirdPartAPIConfig _config;
+        private readonly IThirdPartyConfiguration _config;
 
-        public ExchangeRatesAPI(ThirdPartAPIConfig config)
+        public ExchangeRatesAPI(IThirdPartyConfiguration config)
         {
             _config = config;
-            _client = new RestClient(_config.URL);
-            _maxRetries = _config.MaximumRetries;
+            _client = new RestClient(_config.GetURL());
+            _maxRetries = _config.GetMaximumRetry();
             _retryPolicy = Policy
                 .HandleResult<RestResponse>(a => a.StatusCode == HttpStatusCode.TooManyRequests)
                 .WaitAndRetryAsync(
@@ -40,7 +41,7 @@ namespace CryptoExchange.ACL.ExchangeRates
         public async Task<Dictionary<string, double>> ExchangeBaseOnUSD(string[] exchangeTo)
         {
             var request = new RestRequest("exchangerates_data/latest", Method.Get);
-            request.AddQueryParameter("apikey", _config.ApiKey);
+            request.AddQueryParameter("apikey", _config.GetAPIKey());
             request.AddQueryParameter("base", "USD");
             request.AddQueryParameter("symbols", string.Join(",",exchangeTo));
 

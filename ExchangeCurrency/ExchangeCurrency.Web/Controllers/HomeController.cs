@@ -1,4 +1,5 @@
-﻿using ExchangeCurrency.Web.Models;
+﻿using Exchange.Common.Authentication.interfaces;
+using ExchangeCurrency.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -11,11 +12,12 @@ namespace ExchangeCurrency.Web.Controllers
 {
     public class HomeController : Controller
     {
-        private const string BaseUrl = "https://localhost:44357/";
-        private const string key = "pgH7QzFHJx4w46fI~5Uzi4RvtTwlEXp";
-        public HomeController()
+        private  string baseUrl ;
+        private  string key;
+        public HomeController(IAuthentication clientAuthentication)
         {
-           
+            baseUrl = clientAuthentication.GetURL();
+            key = clientAuthentication.GetAPIKey();
         }
         public async Task<IActionResult> Index([FromQuery] string cryptoSymbol)
         {
@@ -26,7 +28,7 @@ namespace ExchangeCurrency.Web.Controllers
             using (var client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Add("XApiKey", key);
-                client.BaseAddress = new Uri(BaseUrl);
+                client.BaseAddress = new Uri(baseUrl);
                 var result = await client.GetAsync("api/Exchange/Crypto?symbol="+cryptoSymbol);
 
                 if (result.IsSuccessStatusCode)

@@ -1,5 +1,7 @@
 using CryptoExchange.ACL.CoinMarketCap;
 using CryptoExchange.ACL.ExchangeRates;
+using Exchange.Common.Authentication;
+using Exchange.Common.Authentication.interfaces;
 using Exchange.Common.Config;
 using Exchange.Common.Currency;
 using Exchange.Common.interfaces;
@@ -33,22 +35,14 @@ namespace ExchangeCurrency.Web
         public IConfiguration Configuration { get; }
         private APIConfig[] apiConfigs; 
 
-        private ThirdPartAPIConfig GetAPIConfiguration(string name)
-        {
-            foreach (var config in apiConfigs)
-            {
-                if (config.Name.ToLower() == name.ToLower())
-                {
-                    return new ThirdPartAPIConfig(Configuration[config.Name+"ApiKey"], config.URL, config.MaximumRetry);
-                }
-            }
-            return new ThirdPartAPIConfig("","");
-        }
+        
         public virtual void ConfigureServices(IServiceCollection services)
         {
             services.AddAuthentication("Custom")
                 .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>("Custom", null);
             apiConfigs = Configuration.GetSection("APIConfig").Get<APIConfig[]>();
+            var client = Configuration["Client:URL"];
+
             var coinMarketConfig = GetAPIConfiguration("CoinMarket");
             services.AddSingleton(coinMarketConfig);
 
@@ -57,6 +51,8 @@ namespace ExchangeCurrency.Web
 
             services.AddControllersWithViews();
             services.AddControllers();
+
+            services.AddSingleton<IAuthentication>(new ClientConfiguration(client, Configuration["ClientApiKey"]));
             services.AddTransient<ICryptoExchangeService,CryptoExchangeService>();
             services.AddSingleton<IFiatCurrency, FiatCurrency>();
             services.AddSingleton<ICryptoCurrency, CryptoCurrency>();
@@ -87,7 +83,6 @@ namespace ExchangeCurrency.Web
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseRouting();
             app.UseSwagger();
             app.UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", "PlaceInfo Services"));
@@ -101,6 +96,17 @@ namespace ExchangeCurrency.Web
                     pattern: "{controller=Home}/{action=Index}/{cryptoSymbol?}");
             });
             
+        }
+        private IThirdPartyConfiguration GetAPIConfiguration(string name)
+        {
+            foreach (var config in apiConfigs)
+            {
+                if (config.Name.ToLower() == name.ToLower())
+                {
+                    return new ThirdPartyConfiguration(config.URL, Configuration[config.Name + "ApiKey"], config.MaximumRetry);
+                }
+            }
+            return new ThirdPartyConfiguration("", "");
         }
     }
 }
