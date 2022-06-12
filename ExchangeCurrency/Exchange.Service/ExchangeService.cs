@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 
 namespace Exchange.Service
 {
-    public class CryptoExchangeService
+   
+    public class CryptoExchangeService : ICryptoExchangeService
     {
         private readonly ICryptoCurrency _cryptoCurrencies;
         private readonly ICryptoToUSD _cryptoToUSD;
@@ -22,13 +23,13 @@ namespace Exchange.Service
             _exchangeBaseOnUSD = exchangeBaseOnUSD;
         }
 
-        public async Task<Dictionary<string, double>> ToTraditional(string cryptoSymbol, ITraditionalCurrency traditionalCurrency)
+        public async Task<Dictionary<string, double>> ToFiat(string cryptoSymbol, IFiatCurrency fiatCurrency)
         {
             InputValidation(cryptoSymbol);
 
             var uSD = await GetUSDQuote(cryptoSymbol);
 
-            var result = await ExchangeFromUSDToTraditional(uSD, traditionalCurrency);
+            var result = await ExchangeFromUSDToFiat(uSD, fiatCurrency);
 
             return result;
         }
@@ -54,9 +55,9 @@ namespace Exchange.Service
             }
             return result;
         }
-        private async Task<Dictionary<string, double>> ExchangeFromUSDToTraditional(double uSDrate, ITraditionalCurrency traditionalCurrency)
+        private async Task<Dictionary<string, double>> ExchangeFromUSDToFiat(double uSDrate, IFiatCurrency fiatCurrency)
         {
-            string[] exchangeTo = traditionalCurrency.getAll().Select(a => a.Symbol).ToArray();
+            string[] exchangeTo = fiatCurrency.getAll().Select(a => a.Symbol).ToArray();
 
             var exchangerate = await _exchangeBaseOnUSD.ExchangeBaseOnUSD(exchangeTo);
             var result = new Dictionary<string, double>();

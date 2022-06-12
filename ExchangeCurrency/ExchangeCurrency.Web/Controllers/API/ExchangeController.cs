@@ -1,6 +1,6 @@
 ﻿using Exchange.Common.Currency;
 using Exchange.Common.CustomException;
-using Exchange.Service;
+using Exchange.Common.interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
@@ -18,10 +18,10 @@ namespace ExchangeCurrency.Web.Controllers.API
     public class ExchangeController : ControllerBase
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly CryptoExchangeService _cryptoExchangeService;
+        private readonly ICryptoExchangeService _cryptoExchangeService;
 
         public ExchangeController(ILogger<HomeController> logger,
-                              CryptoExchangeService cryptoExchangeService)
+                              ICryptoExchangeService cryptoExchangeService)
         {
             _logger = logger;
             _cryptoExchangeService = cryptoExchangeService;
@@ -34,7 +34,7 @@ namespace ExchangeCurrency.Web.Controllers.API
             try
             {
                 Dictionary<string, double> CurrencyQuotes;
-                CurrencyQuotes = await _cryptoExchangeService.ToTraditional(symbol, new TraditionalCurrency());
+                CurrencyQuotes = await _cryptoExchangeService.ToFiat(symbol, new FiatCurrency());
                 return Ok(CurrencyQuotes);
             }
             catch(SymbolNotFoundException ex)

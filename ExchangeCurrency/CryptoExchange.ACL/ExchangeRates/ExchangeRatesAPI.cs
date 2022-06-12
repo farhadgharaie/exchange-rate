@@ -1,4 +1,4 @@
-﻿using CryptoExchange.ACL.ExchangeRates.ExchnageRatesModel;
+﻿using CryptoExchange.ACL.ExchangeRates.ExchangeRatesModel;
 using Exchange.Common.Config;
 using Exchange.Common.CustomException;
 using Exchange.Common.interfaces;

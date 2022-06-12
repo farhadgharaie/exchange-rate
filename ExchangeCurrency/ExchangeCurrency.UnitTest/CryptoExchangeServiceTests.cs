@@ -25,12 +25,12 @@ namespace ExchangeCurrency.UnitTest
     }
     public class CryptoExchangeServiceTests
     {
-        private readonly Mock<ITraditionalCurrency> convertToStub = new Mock<ITraditionalCurrency>();
+        private readonly Mock<IFiatCurrency> convertToStub = new Mock<IFiatCurrency>();
         private readonly Mock<ICryptoCurrency> inputStub = new Mock<ICryptoCurrency>();
         private readonly Mock<ICryptoToUSD> cryptoToUSDMoq = new Mock<ICryptoToUSD>();
         private readonly Mock<IExchangeBaseOnUSD> exchangeBaseOnUSDMoq = new Mock<IExchangeBaseOnUSD>();
         [Fact]
-        public async Task ExchangeCryptoToTraditional_WithSpecificCrypto_ReturenListOfCurrencies()
+        public async Task ExchangeCryptoToFiat_WithSpecificCrypto_ReturenListOfCurrencies()
         {
             //Arrange
             string inputCryptoSymbol = "cryptoSymbol";
@@ -59,14 +59,14 @@ namespace ExchangeCurrency.UnitTest
             var actual = await new CryptoExchangeService(inputStub.Object,
                                                          cryptoToUSDMoq.Object,
                                                          exchangeBaseOnUSDMoq.Object)
-                                .ToTraditional(inputCryptoSymbol, convertToStub.Object);
+                                .ToFiat(inputCryptoSymbol, convertToStub.Object);
 
             //Assert
             actual.Should().BeEquivalentTo(expectedConverts);
 
         }
         [Fact]
-        public async Task ExchangeCryptoToTraditional_WithZeroUSDRate_ReturenException()
+        public async Task ExchangeCryptoToFiat_WithZeroUSDRate_ReturenException()
         {
             //Arrange
             double outPutUSDRate = 0;
@@ -86,13 +86,13 @@ namespace ExchangeCurrency.UnitTest
 
             //Act
             Func<Task> act = async () => await new CryptoExchangeService(inputStub.Object, cryptoToUSDMoq.Object, exchangeBaseOnUSDMoq.Object)
-                                .ToTraditional(cryptoCurrency, convertToStub.Object);
+                                .ToFiat(cryptoCurrency, convertToStub.Object);
 
             //Assert
             await act.Should().ThrowAsync<NoUSDBaseQuoteProvidedException>();
         }
         [Fact]
-        public async Task ExchangeCryptoToTraditional_WithWrongCrypto_ReturenBaseNotFoundException()
+        public async Task ExchangeCryptoToFiat_WithWrongCrypto_ReturenBaseNotFoundException()
         {
             //Arrange
             var cryptoCurrency = "wrongCoin";
@@ -112,13 +112,13 @@ namespace ExchangeCurrency.UnitTest
 
             //Act
             Func<Task> act = async () => await new CryptoExchangeService(inputStub.Object, cryptoToUSDMoq.Object, exchangeBaseOnUSDMoq.Object)
-                                .ToTraditional(cryptoCurrency, convertToStub.Object);
+                                .ToFiat(cryptoCurrency, convertToStub.Object);
 
             //Assert
             await act.Should().ThrowAsync<SymbolNotFoundException>();
         }
         [Fact]
-        public async Task ExchangeCryptoToTraditional_WithNullOrEmptyInput_ReturenSymbolNotProvidedException()
+        public async Task ExchangeCryptoToFiat_WithNullOrEmptyInput_ReturenSymbolNotProvidedException()
         {
             //Arrange
             string nullInput = null;
@@ -138,7 +138,7 @@ namespace ExchangeCurrency.UnitTest
 
             //Act
             Func<Task> act = async () => await new CryptoExchangeService(inputStub.Object, cryptoToUSDMoq.Object, exchangeBaseOnUSDMoq.Object)
-                                .ToTraditional(nullInput, convertToStub.Object);
+                                .ToFiat(nullInput, convertToStub.Object);
 
             //Assert
             await act.Should().ThrowAsync<SymbolNotProvidedException>();

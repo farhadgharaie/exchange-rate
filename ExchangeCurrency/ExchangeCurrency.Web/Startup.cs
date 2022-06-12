@@ -52,16 +52,16 @@ namespace ExchangeCurrency.Web
             var coinMarketConfig = GetAPIConfiguration("CoinMarket");
             services.AddSingleton(coinMarketConfig);
 
-            var exchnageRateConfig = GetAPIConfiguration("ExchangeRates");
-            services.AddSingleton(exchnageRateConfig);
+            var exchangeRateConfig = GetAPIConfiguration("ExchangeRates");
+            services.AddSingleton(exchangeRateConfig);
 
             services.AddControllersWithViews();
             services.AddControllers();
-            services.AddTransient<CryptoExchangeService>();
-            services.AddSingleton<ITraditionalCurrency>(new TraditionalCurrency());
-            services.AddSingleton<ICryptoCurrency>(new CryptoCurrency());
+            services.AddTransient<ICryptoExchangeService,CryptoExchangeService>();
+            services.AddSingleton<IFiatCurrency, FiatCurrency>();
+            services.AddSingleton<ICryptoCurrency, CryptoCurrency>();
             services.AddSingleton<ICryptoToUSD>(new CoinMarketCapAPI(coinMarketConfig));
-            services.AddSingleton<IExchangeBaseOnUSD>(new ExchangeRatesAPI(exchnageRateConfig));
+            services.AddSingleton<IExchangeBaseOnUSD>(new ExchangeRatesAPI(exchangeRateConfig));
 
             services.AddSwaggerGen(options =>
             {

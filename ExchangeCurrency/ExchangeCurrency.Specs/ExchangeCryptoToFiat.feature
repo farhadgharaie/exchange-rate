@@ -1,5 +1,5 @@
-﻿Feature: ExchnageCrytoToTraditional
-	end user get cryptocurrency conversion to traditional currencies
+﻿Feature: ExchangeCryptoToFiat
+	end user get cryptocurrency conversion to fiat currencies
 
 @mytag
 Scenario: Show Cryptocurrency exchangerate

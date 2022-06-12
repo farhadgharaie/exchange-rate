@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Exchange.Common.Currency
 {
-    public class TraditionalCurrency : Currency, ITraditionalCurrency
+    public class FiatCurrency : Currency, IFiatCurrency
     {
         private static List<CurrencyModel> currencies = new List<CurrencyModel>
         {
@@ -14,7 +14,7 @@ namespace Exchange.Common.Currency
             new CurrencyModel("Australian dollar","AUD")
 
         };
-        public TraditionalCurrency() : base(currencies)
+        public FiatCurrency() : base(currencies)
         {
 
         }

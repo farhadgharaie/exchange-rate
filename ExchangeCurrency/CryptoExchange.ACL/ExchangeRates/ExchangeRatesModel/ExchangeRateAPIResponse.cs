@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CryptoExchange.ACL.ExchangeRates.ExchnageRatesModel
+namespace CryptoExchange.ACL.ExchangeRates.ExchangeRatesModel
 {
     public class ExchangeRateAPIResponse
     {

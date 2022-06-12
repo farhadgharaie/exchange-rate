@@ -18,7 +18,7 @@ namespace ExchangeCurrency.Specs
 {
 
     [Binding]
-    public class ExchnageCrytoToTraditionalSteps : IClassFixture<CustomWebApplicationFactory<Startup>>
+    public class ExchangeCryptoToFiatSteps : IClassFixture<CustomWebApplicationFactory<Startup>>
     {
         private readonly CustomWebApplicationFactory<Startup> _factory;
         private HttpClient _client { get; set; }
@@ -26,7 +26,7 @@ namespace ExchangeCurrency.Specs
         private string symbol;
 
 
-        public ExchnageCrytoToTraditionalSteps(CustomWebApplicationFactory<Startup> factory)
+        public ExchangeCryptoToFiatSteps(CustomWebApplicationFactory<Startup> factory)
         {
             _factory = factory;
             _client = _factory.WithWebHostBuilder(builder=> {

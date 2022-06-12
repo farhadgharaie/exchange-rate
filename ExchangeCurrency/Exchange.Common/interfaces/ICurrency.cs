@@ -13,7 +13,7 @@ namespace Exchange.Common.interfaces
     {
 
     }
-    public interface ITraditionalCurrency : ICurrency
+    public interface IFiatCurrency : ICurrency
     {
 
     }
