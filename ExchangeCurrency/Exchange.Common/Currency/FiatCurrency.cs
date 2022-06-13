@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Exchange.Common.Currency
 {
-    public class FiatCurrency : CurrencyTemplate
+    public class FiatCurrency : CurrencyTemplate,IFiatCurrency
     {
         public FiatCurrency()
         {

@@ -11,18 +11,18 @@ using Exchange.Common.CustomException;
 
 namespace ExchangeCurrency.UnitTest
 {
-    public class FakeOutputCurrency : Currency
+
+    public class FakeOutputCurrency : CurrencyTemplate
     {
-        private static List<CurrencyModel> currencies = new List<CurrencyModel>
-            {
+        public override IEnumerable<CurrencyModel> Select()
+        {
+            return new List<CurrencyModel>() {
                 new CurrencyModel("test1","tt1"),
                 new CurrencyModel("test2","tt2")
             };
-        public FakeOutputCurrency() : base(currencies)
-        {
-
         }
     }
+
     public class CryptoExchangeServiceTests
     {
         private readonly Mock<IFiatCurrency> convertToStub = new Mock<IFiatCurrency>();
@@ -45,8 +45,8 @@ namespace ExchangeCurrency.UnitTest
             inputStub.Setup(a => a.IsSymbolExist(It.IsAny<string>()))
                .Returns(true);
 
-            convertToStub.Setup(a => a.getAll())
-              .Returns(new FakeOutputCurrency().getAll());
+            convertToStub.Setup(a => a.GetAll())
+              .Returns(new FakeOutputCurrency().GetAll());
 
             cryptoToUSDMoq.Setup(a => a.GetUSDQuoteAsync(It.IsAny<string>()))
                 .Returns(Task.FromResult((double)outPutUSDRate));
@@ -75,8 +75,8 @@ namespace ExchangeCurrency.UnitTest
             inputStub.Setup(a => a.IsSymbolExist(It.IsAny<string>()))
                .Returns(true);
 
-            convertToStub.Setup(a => a.getAll())
-              .Returns(new FakeOutputCurrency().getAll());
+            convertToStub.Setup(a => a.GetAll())
+              .Returns(new FakeOutputCurrency().GetAll());
 
             cryptoToUSDMoq.Setup(a => a.GetUSDQuoteAsync(It.IsAny<string>()))
                 .Returns(Task.FromResult((double)outPutUSDRate));
@@ -97,7 +97,7 @@ namespace ExchangeCurrency.UnitTest
             //Arrange
             var cryptoCurrency = "wrongCoin";
 
-            convertToStub.Setup(a => a.getAll())
+            convertToStub.Setup(a => a.GetAll())
                 .Returns(It.IsAny<IEnumerable<CurrencyModel>>());
 
             inputStub.Setup(a => a.IsSymbolExist(It.IsAny<string>()))
@@ -123,7 +123,7 @@ namespace ExchangeCurrency.UnitTest
             //Arrange
             string nullInput = null;
 
-            convertToStub.Setup(a => a.getAll())
+            convertToStub.Setup(a => a.GetAll())
                 .Returns(It.IsAny<IEnumerable<CurrencyModel>>());
 
             inputStub.Setup(a => a.IsSymbolExist(It.IsAny<string>()))

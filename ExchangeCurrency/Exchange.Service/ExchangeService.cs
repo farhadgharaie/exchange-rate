@@ -10,10 +10,10 @@ namespace Exchange.Service
    
     public class CryptoExchangeService : ICryptoExchangeService
     {
-        private readonly ICurrency _cryptoCurrencies;
+        private readonly ICryptoCurrency _cryptoCurrencies;
         private readonly ICryptoToUSD _cryptoToUSD;
         private readonly IExchangeBaseOnUSD _exchangeBaseOnUSD;
-        public CryptoExchangeService(ICurrency cryptoCurrencies,
+        public CryptoExchangeService(ICryptoCurrency cryptoCurrencies,
                                      ICryptoToUSD cryptoToUsD,
                                      IExchangeBaseOnUSD exchangeBaseOnUSD
             )

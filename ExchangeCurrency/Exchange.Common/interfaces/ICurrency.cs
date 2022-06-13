@@ -9,4 +9,11 @@ namespace Exchange.Common.interfaces
         bool IsSymbolExist(string symbol);
         CurrencyModel Get(string symbol);
     }
+    public interface IFiatCurrency : ICurrency
+    {
+    }
+    public interface ICryptoCurrency : ICurrency
+    {
+    }
+
 }
