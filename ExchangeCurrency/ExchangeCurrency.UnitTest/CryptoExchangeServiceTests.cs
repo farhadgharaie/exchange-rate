@@ -23,8 +23,8 @@ namespace ExchangeCurrency.UnitTest
         {
            var result= new Dictionary<string, double>()
             {
-                { "tt2",1},
-                { "tt1",1}
+                { "tt2",2},
+                { "tt1",3}
             };
             return result;
         }
@@ -71,12 +71,38 @@ namespace ExchangeCurrency.UnitTest
             double outPutUSDRate = 1;
             var expectedConverts = new Dictionary<string, double>()
             {
-                { "tt2",outPutUSDRate},
-                { "tt1",outPutUSDRate}
+                { "tt2",2},
+                { "tt1",3}
             };
 
             inputStub.Setup(a => a.ConvertTo(It.IsAny<CurrencyModel>(), It.IsAny<CurrencyModel>()))
                .Returns(new FakeInputCurrency().ConvertTo(It.IsAny<CurrencyModel>(), It.IsAny<CurrencyModel>()));
+
+            convertToStub.Setup(a => a.ConvertToAll(It.IsAny<CurrencyModel>()))
+              .Returns(new FakeOutputCurrency().ConvertToAll(It.IsAny<CurrencyModel>()));
+
+            //Act
+            var actual = await new CryptoExchangeService(inputStub.Object)
+                                  .ToFiat(inputCryptoSymbol, convertToStub.Object);
+
+            //Assert
+            actual.Should().BeEquivalentTo(expectedConverts);
+
+        }
+        [Fact]
+        public async Task ExchangeCryptoToFiat_WithSpecificBaseRate_ReturenConvertMultipleByBaseRate()
+        {
+            //Arrange
+            string inputCryptoSymbol = "cryptoSymbol";
+            double baseRate = 2.00;
+            var expectedConverts = new Dictionary<string, double>()
+            {
+                { "tt2", 4},
+                { "tt1", 6}
+            };
+
+            inputStub.Setup(a => a.ConvertTo(It.IsAny<CurrencyModel>(), It.IsAny<CurrencyModel>()))
+               .Returns( Task.FromResult(baseRate));
 
             convertToStub.Setup(a => a.ConvertToAll(It.IsAny<CurrencyModel>()))
               .Returns(new FakeOutputCurrency().ConvertToAll(It.IsAny<CurrencyModel>()));
