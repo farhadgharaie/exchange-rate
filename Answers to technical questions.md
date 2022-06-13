@@ -4,7 +4,7 @@
 1- How long did you spend on the coding assignment? What would you add to your solution if you had more time? If you didn't spend much time on the coding assignment then use this as an opportunity to explain what you would add.
 ``
  
- It took 6 days, each day 5 hours to commit the assignment. I try to use many principles to refactor the code. 
+ It took 6 days, each day 5 or 6 hours to commit the assignment. I try to use many principles to refactor the code. 
  I think the result could cache in the memory for a configurable time and response to requests for in memory crypto symbol provided much faster than call third party APIs.
 
 ``
@@ -15,16 +15,16 @@
    - Generic attributes
    - List patterns
  
-  Also, the C# 8 have feature like :
+  Also, the C# 8 has features like :
    - Property patterns, Switch expressions.
    - Using declarations
-
+ 
 ``
 3- How would you track down a performance issue in production? Have you ever had to do this?
 ``
 
  By monitoring the time between requests and responses, errors or exceptions - send to email or gathered by data processing pipeline-that occured in a specific time or alarmed by a monitoring system can find the performance issues.Moreover, There are may several external source like databases, 3rd party services or network perfomance that should monitored by agents to collect data and process for issues.
- I used ELK stack (Elasticsearch,Logstash,Kibana) to gather all events in a production and have a monitoring for different responses. Also, Used Seqlog for all of productions, generally. 
+ I used ELK stack (Elasticsearch, Logstash, Kibana) to gather all events in a production and have a monitoring for different responses. Also, Used Seqlog for all of productions, generally. 
 
 ``
 4- What was the latest technical book you have read or tech conference you have been to? What did you learn?
