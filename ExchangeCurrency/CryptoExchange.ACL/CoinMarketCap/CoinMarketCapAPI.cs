@@ -1,4 +1,6 @@
 ﻿using CryptoExchange.ACL.CoinMarketCapModel;
+using Exchange.Common.Authentication.interfaces;
+using Exchange.Common.Currency;
 using Exchange.Common.CustomException;
 using Exchange.Common.interfaces;
 using Polly;
@@ -11,41 +13,43 @@ using System.Threading.Tasks;
 
 namespace CryptoExchange.ACL.CoinMarketCap
 {
-    
-    public class CoinMarketCapAPI : ICryptoToUSD
+    public class CoinMarketCapAPI : IConvertSingle
     {
         private readonly RestClient _client;
-        const string APIKey = @"bd820c50-a4a4-4b76-8b23-a78d07a2ed85";
-        const int MAX_RETRIES = 3;
+        private int _maxRetries ;
         private readonly AsyncRetryPolicy<RestResponse> _retryPolicy;
-    
-        public CoinMarketCapAPI()
+        private readonly IThirdPartyConfiguration _config;
+
+        public CoinMarketCapAPI(IThirdPartyConfiguration config)
         {
-            _client = new RestClient(@"https://pro-api.coinmarketcap.com/");
-            _client.AddDefaultHeader("X-CMC_PRO_API_KEY", APIKey);
+            _config = config;
+            _maxRetries = _config.GetMaximumRetry();
+            _client = new RestClient(_config.GetURL());
+            _client.AddDefaultHeader("X-CMC_PRO_API_KEY", _config.GetAPIKey());
             _retryPolicy = Policy
                 .HandleResult<RestResponse>(a => a.StatusCode == HttpStatusCode.TooManyRequests)
                 .WaitAndRetryAsync(
-                   retryCount: MAX_RETRIES,
+                   retryCount: _maxRetries,
                    sleepDurationProvider: _ => TimeSpan.FromSeconds(1),
                    onRetry: (exception, sleepDuration, attemptNumber, context) =>
                    {
-                       //Log($"Too many requests. Retrying in {sleepDuration}. {attemptNumber} / {MAX_RETRIES}");
+                       throw new ThirdPartyAPIServiceUnavailableException();
                    });
         }
-        public async Task<double> GetUSDQuoteAsync(string cryptoSymbol)
+
+        public async Task<double> ConvertTo(CurrencyModel fromCurrency, CurrencyModel toCurrency)
         {
             var request = new RestRequest("v2/tools/price-conversion", Method.Get);
             request.AddQueryParameter("amount", 1);
-            request.AddQueryParameter("symbol", cryptoSymbol);
-            request.AddQueryParameter("convert", "USD");
-            
-            var respone= await _retryPolicy.ExecuteAsync(async () =>
+            request.AddQueryParameter("symbol", fromCurrency.Symbol);
+            request.AddQueryParameter("convert", toCurrency.Symbol);
+
+            var respone = await _retryPolicy.ExecuteAsync(async () =>
             {
                 var res = await _client.ExecuteGetAsync(request);
                 if (!res.IsSuccessful)
                 {
-                    throw new ThirdPartyAPIServiceUnavailableException();
+                    throw new NoResponseThirdPartyAPIServiceException();
                 }
                 return res;
             });

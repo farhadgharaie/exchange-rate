@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Exchange.Common.Currency
-{
-    public class CryptoCurrency : CurrencyTemplate,ICryptoCurrency
+{ 
+        public class FiatCurrency : CurrencyTemplate,IFiatCurrency
     {
-        private readonly IConvertSingle _convertSingle;
         private readonly IConvertAll _convertAll;
-        public CryptoCurrency(IConvertSingle convertSingle,IConvertAll convertAll)
+        private readonly IConvertSingle _convertSingle;
+        public FiatCurrency(IConvertSingle convertSingle, IConvertAll convertAll)
         {
             _convertSingle = convertSingle;
             _convertAll = convertAll;
         }
+
         public override Task<double> ConvertTo(CurrencyModel fromCurrency, CurrencyModel toCurrency)
         {
             return _convertSingle.ConvertTo(fromCurrency, toCurrency);
@@ -26,8 +27,13 @@ namespace Exchange.Common.Currency
         public override IEnumerable<CurrencyModel> Select()
         {
             return new List<CurrencyModel>() {
-               new CurrencyModel("Bitcoin", "BTC")
-           };
+            new CurrencyModel("Dollar", "USD"),
+            new CurrencyModel("Euro", "EUR"),
+            new CurrencyModel("Brazilian real", "BRL"),
+            new CurrencyModel("British pound sterling", "GBP"),
+            new CurrencyModel("Australian dollar", "AUD")
+        };
         }
+        
     }
 }

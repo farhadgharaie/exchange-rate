@@ -1,44 +1,74 @@
 using CryptoExchange.ACL.CoinMarketCap;
 using CryptoExchange.ACL.ExchangeRates;
+using Exchange.Common.Authentication;
+using Exchange.Common.Authentication.interfaces;
+using Exchange.Common.Config;
 using Exchange.Common.Currency;
 using Exchange.Common.interfaces;
 using Exchange.Service;
+using ExchangeCurrency.Web.Handler;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
 
 namespace ExchangeCurrency.Web
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
-            Configuration = configuration;
-
+            var builder = new ConfigurationBuilder()
+           .SetBasePath(env.ContentRootPath)
+           .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+           .AddEnvironmentVariables();
+            if (env.IsDevelopment())
+            {
+                builder.AddUserSecrets(Assembly.GetExecutingAssembly());
+            }
+            Configuration = builder.Build();
         }
 
         public IConfiguration Configuration { get; }
+        private APIConfig[] apiConfigs; 
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        
         public virtual void ConfigureServices(IServiceCollection services)
         {
+            services.AddAuthentication("Custom")
+                .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>("Custom", null);
+           
+            apiConfigs = Configuration.GetSection("APIConfig").Get<APIConfig[]>();
+            var client = Configuration["Client:URL"];
+
+            var coinMarketConfig = GetAPIConfiguration("CoinMarket");
+            services.AddSingleton(coinMarketConfig);
+
+            var exchangeRateConfig = GetAPIConfiguration("ExchangeRates");
+            services.AddSingleton(exchangeRateConfig);
+
             services.AddControllersWithViews();
             services.AddControllers();
-            services.AddTransient<CryptoExchangeService>();
-            services.AddSingleton<ITraditionalCurrency>(new TraditionalCurrency());
-            services.AddSingleton<ICryptoCurrency>(new CryptoCurrency());
-            services.AddSingleton<ICryptoToUSD>(new CoinMarketCapAPI());
-            services.AddSingleton<IExchangeBaseOnUSD>(new ExchangeRatesAPI());
+
+            services.AddSingleton<IAuthentication>(new ClientConfiguration(client, Configuration["ClientApiKey"]));
+            services.AddTransient<ICryptoExchangeService,CryptoExchangeService>();
+            services.AddSingleton<IFiatCurrency>(new FiatCurrency(null, new ExchangeRatesAPI(exchangeRateConfig)));
+            services.AddSingleton<ICryptoCurrency>(new CryptoCurrency(new CoinMarketCapAPI(coinMarketConfig),null));
+
+            services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Exchange Service API",
+                    Version = "v1",
+                    Description = "Crypto Exchange Service, Need ApiKey to use."
+                });
+            });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -48,16 +78,16 @@ namespace ExchangeCurrency.Web
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseRouting();
-
+            app.UseSwagger();
+            app.UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", "PlaceInfo Services"));
+            app.UseAuthentication();
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
@@ -65,6 +95,18 @@ namespace ExchangeCurrency.Web
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{cryptoSymbol?}");
             });
+            
+        }
+        private IThirdPartyConfiguration GetAPIConfiguration(string name)
+        {
+            foreach (var config in apiConfigs)
+            {
+                if (config.Name.ToLower() == name.ToLower())
+                {
+                    return new ThirdPartyConfiguration(config.URL, Configuration[config.Name + "ApiKey"], config.MaximumRetry);
+                }
+            }
+            return new ThirdPartyConfiguration("", "");
         }
     }
 }

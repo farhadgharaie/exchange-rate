@@ -19,7 +19,7 @@ namespace ExchangeCurrency.Specs
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class ExchnageCrytoToTraditionalFeature : object, Xunit.IClassFixture<ExchnageCrytoToTraditionalFeature.FixtureData>, System.IDisposable
+    public partial class ExchangeCryptoToFiatFeature : object, Xunit.IClassFixture<ExchangeCryptoToFiatFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
@@ -28,10 +28,10 @@ namespace ExchangeCurrency.Specs
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
-#line 1 "ExchnageCrytoToTraditional.feature"
+#line 1 "ExchangeCryptoToFiat.feature"
 #line hidden
         
-        public ExchnageCrytoToTraditionalFeature(ExchnageCrytoToTraditionalFeature.FixtureData fixtureData, ExchangeCurrency_Specs_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
+        public ExchangeCryptoToFiatFeature(ExchangeCryptoToFiatFeature.FixtureData fixtureData, ExchangeCurrency_Specs_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
             this.TestInitialize();
@@ -40,7 +40,7 @@ namespace ExchangeCurrency.Specs
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "ExchnageCrytoToTraditional", "\tend user get cryptocurrency conversion to traditional currencies", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "ExchangeCryptoToFiat", "\tend user get cryptocurrency conversion to fiat currencies", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -81,7 +81,7 @@ namespace ExchangeCurrency.Specs
         }
         
         [Xunit.SkippableTheoryAttribute(DisplayName="Show Cryptocurrency exchangerate")]
-        [Xunit.TraitAttribute("FeatureTitle", "ExchnageCrytoToTraditional")]
+        [Xunit.TraitAttribute("FeatureTitle", "ExchangeCryptoToFiat")]
         [Xunit.TraitAttribute("Description", "Show Cryptocurrency exchangerate")]
         [Xunit.TraitAttribute("Category", "mytag")]
         [Xunit.InlineDataAttribute("USD", new string[0])]
@@ -131,12 +131,12 @@ this.ScenarioInitialize(scenarioInfo);
             
             public FixtureData()
             {
-                ExchnageCrytoToTraditionalFeature.FeatureSetup();
+                ExchangeCryptoToFiatFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                ExchnageCrytoToTraditionalFeature.FeatureTearDown();
+                ExchangeCryptoToFiatFeature.FeatureTearDown();
             }
         }
     }
