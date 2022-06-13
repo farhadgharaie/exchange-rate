@@ -4,7 +4,7 @@
 1- How long did you spend on the coding assignment? What would you add to your solution if you had more time? If you didn't spend much time on the coding assignment then use this as an opportunity to explain what you would add.
 ``
  
- It took 6 days, each day 5 hours to commit the assignment. I try to use many principles to refactor the code. 
+ It tooks 4 days, each day 6 hours to commit the assignment. 
  I think the result could cache in the memory for a configurable time and response to requests for in memory crypto symbol provided much faster than call third party APIs.
 
 ``
@@ -33,10 +33,7 @@
   Similar to the onion and hexagonal architectures, clean architecture has a separation of concern objective which divides the software into different layers. The Framework Independence, Testable, UI, and external agency independence are the main key to the architecture.
   There are four-layer, Entities, Use Cases, Interface Adapters, and Frameworks-and-Drivers, but there is no rule that says you must always have just these four. However, The  Dependency Rule, which points that source code dependencies can only point inwards, is always applied. 
 
-- 2 Months ago, `Building Microservices (Designing fine-grained systems)` by `Sam Newman`.
- Microservices are small, autonomous services that work together.  They are small with the definition of cohesion which drives to have related code grouped. It is the same as the Single Responsibility Principle, which states "Gather together those things that change for the same reason, and separate those things that change for different reasons".
- They are autonomous which state, that services need to be able to change independently of each other and be deployed by themselves without requiring consumers to change. 
- It also pointed out that great software comes from great people. 
+- 2 Months ago, `Building Microservices (Designing fine-grained systems)` by `Sam Newman`. 
 
 ``
 5- What do you think about this technical assessment?
