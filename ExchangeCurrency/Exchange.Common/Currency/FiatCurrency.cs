@@ -3,20 +3,21 @@ using System.Collections.Generic;
 
 namespace Exchange.Common.Currency
 {
-    public class FiatCurrency : Currency, IFiatCurrency
+    public class FiatCurrency : CurrencyTemplate
     {
-        private static List<CurrencyModel> currencies = new List<CurrencyModel>
+        public FiatCurrency()
         {
-            new CurrencyModel("Dollar","USD"),
-            new CurrencyModel("Euro","EUR"),
-            new CurrencyModel("Brazilian real","BRL"),
-            new CurrencyModel("British pound sterling","GBP"),
-            new CurrencyModel("Australian dollar","AUD")
-
-        };
-        public FiatCurrency() : base(currencies)
-        {
-
         }
+        public override IEnumerable<CurrencyModel> Select()
+        {
+            return new List<CurrencyModel>() {
+            new CurrencyModel("Dollar", "USD"),
+            new CurrencyModel("Euro", "EUR"),
+            new CurrencyModel("Brazilian real", "BRL"),
+            new CurrencyModel("British pound sterling", "GBP"),
+            new CurrencyModel("Australian dollar", "AUD")
+        };
+        }
+
     }
 }

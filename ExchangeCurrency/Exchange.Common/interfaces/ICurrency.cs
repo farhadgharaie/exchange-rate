@@ -5,16 +5,8 @@ namespace Exchange.Common.interfaces
 {
     public interface ICurrency
     {
-        IEnumerable<CurrencyModel> getAll();
+        IEnumerable<CurrencyModel> GetAll();
         bool IsSymbolExist(string symbol);
-
-    }
-    public interface ICryptoCurrency : ICurrency
-    {
-
-    }
-    public interface IFiatCurrency : ICurrency
-    {
-
+        CurrencyModel Get(string symbol);
     }
 }

@@ -5,6 +5,19 @@ using Exchange.Common.Currency;
 
 namespace ExchangeCurrency.UnitTest
 {
+    public class FakeCyrrency : CurrencyTemplate
+    {
+        public override IEnumerable<CurrencyModel> Select()
+        {
+            return new List<CurrencyModel>()
+            {
+                 new CurrencyModel("Test","tst"),
+                new CurrencyModel("Test2","tst2"),
+                new CurrencyModel("Test3","tst3"),
+            };
+        }
+    }
+
     public class CurrencyTests
     {
         private readonly List<CurrencyModel> fakeCurrencies = new List<CurrencyModel>()
@@ -20,7 +33,7 @@ namespace ExchangeCurrency.UnitTest
             string wrongSymbol = "ts";
 
             //Act
-            var currency = new Currency(fakeCurrencies).IsSymbolExist(wrongSymbol);
+            var currency = new FakeCyrrency().IsSymbolExist(wrongSymbol);
 
             //Assert
             currency.Should().BeFalse();
@@ -32,7 +45,7 @@ namespace ExchangeCurrency.UnitTest
             string existedSymbol = "tst";
 
             //Act
-            var currency = new Currency(fakeCurrencies).IsSymbolExist(existedSymbol);
+            var currency = new FakeCyrrency().IsSymbolExist(existedSymbol);
 
             //Assert
             currency.Should().BeTrue();
@@ -49,7 +62,7 @@ namespace ExchangeCurrency.UnitTest
             };
 
             //Act
-            var currency = new Currency(fakeCurrencies).getAll();
+            var currency = new FakeCyrrency().GetAll();
 
             //Assert
             currency.Should().BeEquivalentTo(expected);

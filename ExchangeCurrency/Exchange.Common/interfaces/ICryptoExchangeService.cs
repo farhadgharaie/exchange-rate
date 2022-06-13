@@ -5,6 +5,6 @@ namespace Exchange.Common.interfaces
 {
     public interface ICryptoExchangeService
     {
-        Task<Dictionary<string, double>> ToFiat(string cryptoSymbol, IFiatCurrency fiatCurrency);
+        Task<Dictionary<string, double>> ToFiat(string cryptoSymbol, ICurrency fiatCurrency);
     }
 }
