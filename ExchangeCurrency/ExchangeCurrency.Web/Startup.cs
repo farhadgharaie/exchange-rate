@@ -7,7 +7,6 @@ using Exchange.Common.Currency;
 using Exchange.Common.interfaces;
 using Exchange.Service;
 using ExchangeCurrency.Web.Handler;
-using ExchangeCurrency.Web.Middleware;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -82,8 +81,6 @@ namespace ExchangeCurrency.Web
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
-            app.UseMiddleware<UnhandledExceptionMiddleware>();
-
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
