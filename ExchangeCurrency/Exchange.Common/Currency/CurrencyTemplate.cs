@@ -1,7 +1,9 @@
-﻿using Exchange.Common.interfaces;
+﻿using Exchange.Common.CustomException;
+using Exchange.Common.interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Exchange.Common.Currency
 {
@@ -17,15 +19,23 @@ namespace Exchange.Common.Currency
             var isSymbolExist= Select().Any(a => a.Symbol.Equals(symbol, StringComparison.OrdinalIgnoreCase));
             return isSymbolExist;
         }
+        public abstract Task<Dictionary<string, double>> ConvertToAll(CurrencyModel fromCurrency);
+       
+        public abstract Task<double> ConvertTo(CurrencyModel fromCurrency, CurrencyModel toCurrency);
 
         public CurrencyModel Get(string symbol)
         {
-            if (IsSymbolExist(symbol))
+            if (string.IsNullOrEmpty(symbol))
             {
-                return Select().FirstOrDefault(currency => currency.Symbol.ToLower() == symbol.ToLower());
+                throw new SymbolNotProvidedException();
             }
-            return null;
+            else if (!IsSymbolExist(symbol))
+            {
+                throw new SymbolNotFoundException();
+            }
+            return Select().FirstOrDefault(currency => currency.Symbol.ToLower() == symbol.ToLower());
         }
+
     }
 
 }

@@ -40,6 +40,7 @@ namespace ExchangeCurrency.Web
         {
             services.AddAuthentication("Custom")
                 .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>("Custom", null);
+           
             apiConfigs = Configuration.GetSection("APIConfig").Get<APIConfig[]>();
             var client = Configuration["Client:URL"];
 
@@ -54,10 +55,8 @@ namespace ExchangeCurrency.Web
 
             services.AddSingleton<IAuthentication>(new ClientConfiguration(client, Configuration["ClientApiKey"]));
             services.AddTransient<ICryptoExchangeService,CryptoExchangeService>();
-            services.AddSingleton<IFiatCurrency, FiatCurrency>();
-            services.AddSingleton<ICryptoCurrency, CryptoCurrency>();
-            services.AddSingleton<ICryptoToUSD>(new CoinMarketCapAPI(coinMarketConfig));
-            services.AddSingleton<IExchangeBaseOnUSD>(new ExchangeRatesAPI(exchangeRateConfig));
+            services.AddSingleton<IFiatCurrency>(new FiatCurrency(null, new ExchangeRatesAPI(exchangeRateConfig)));
+            services.AddSingleton<ICryptoCurrency>(new CryptoCurrency(new CoinMarketCapAPI(coinMarketConfig),null));
 
             services.AddSwaggerGen(options =>
             {

@@ -14,6 +14,41 @@ namespace ExchangeCurrency.UnitTest
 
     public class FakeOutputCurrency : CurrencyTemplate
     {
+        public override Task<double> ConvertTo(CurrencyModel fromCurrency, CurrencyModel toCurrency)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override async Task<Dictionary<string, double>> ConvertToAll(CurrencyModel fromCurrency)
+        {
+           var result= new Dictionary<string, double>()
+            {
+                { "tt2",1},
+                { "tt1",1}
+            };
+            return result;
+        }
+
+        public override IEnumerable<CurrencyModel> Select()
+        {
+            return new List<CurrencyModel>() {
+                new CurrencyModel("test1","tt1"),
+                new CurrencyModel("test2","tt2")
+            };
+        }
+    }
+    public class FakeInputCurrency : CurrencyTemplate
+    {
+        public override async Task<double> ConvertTo(CurrencyModel fromCurrency, CurrencyModel toCurrency)
+        {
+            return 1.0;
+        }
+
+        public override async Task<Dictionary<string, double>> ConvertToAll(CurrencyModel fromCurrency)
+        {
+            throw new NotImplementedException();
+        }
+
         public override IEnumerable<CurrencyModel> Select()
         {
             return new List<CurrencyModel>() {
@@ -27,8 +62,7 @@ namespace ExchangeCurrency.UnitTest
     {
         private readonly Mock<IFiatCurrency> convertToStub = new Mock<IFiatCurrency>();
         private readonly Mock<ICryptoCurrency> inputStub = new Mock<ICryptoCurrency>();
-        private readonly Mock<ICryptoToUSD> cryptoToUSDMoq = new Mock<ICryptoToUSD>();
-        private readonly Mock<IExchangeBaseOnUSD> exchangeBaseOnUSDMoq = new Mock<IExchangeBaseOnUSD>();
+       
         [Fact]
         public async Task ExchangeCryptoToFiat_WithSpecificCrypto_ReturenListOfCurrencies()
         {
@@ -41,107 +75,19 @@ namespace ExchangeCurrency.UnitTest
                 { "tt1",outPutUSDRate}
             };
 
+            inputStub.Setup(a => a.ConvertTo(It.IsAny<CurrencyModel>(), It.IsAny<CurrencyModel>()))
+               .Returns(new FakeInputCurrency().ConvertTo(It.IsAny<CurrencyModel>(), It.IsAny<CurrencyModel>()));
 
-            inputStub.Setup(a => a.IsSymbolExist(It.IsAny<string>()))
-               .Returns(true);
-
-            convertToStub.Setup(a => a.GetAll())
-              .Returns(new FakeOutputCurrency().GetAll());
-
-            cryptoToUSDMoq.Setup(a => a.GetUSDQuoteAsync(It.IsAny<string>()))
-                .Returns(Task.FromResult((double)outPutUSDRate));
-
-            exchangeBaseOnUSDMoq.Setup(a => a.ExchangeBaseOnUSD(It.IsAny<string[]>()))
-                .Returns(Task.FromResult(new Dictionary<string, double>() { { "tt2",outPutUSDRate},
-                { "tt1",outPutUSDRate} }));
+            convertToStub.Setup(a => a.ConvertToAll(It.IsAny<CurrencyModel>()))
+              .Returns(new FakeOutputCurrency().ConvertToAll(It.IsAny<CurrencyModel>()));
 
             //Act
-            var actual = await new CryptoExchangeService(inputStub.Object,
-                                                         cryptoToUSDMoq.Object,
-                                                         exchangeBaseOnUSDMoq.Object)
-                                .ToFiat(inputCryptoSymbol, convertToStub.Object);
+            var actual = await new CryptoExchangeService(inputStub.Object)
+                                  .ToFiat(inputCryptoSymbol, convertToStub.Object);
 
             //Assert
             actual.Should().BeEquivalentTo(expectedConverts);
 
-        }
-        [Fact]
-        public async Task ExchangeCryptoToFiat_WithZeroUSDRate_ReturenException()
-        {
-            //Arrange
-            double outPutUSDRate = 0;
-            var cryptoCurrency = "cryptoSymbol";
-
-            inputStub.Setup(a => a.IsSymbolExist(It.IsAny<string>()))
-               .Returns(true);
-
-            convertToStub.Setup(a => a.GetAll())
-              .Returns(new FakeOutputCurrency().GetAll());
-
-            cryptoToUSDMoq.Setup(a => a.GetUSDQuoteAsync(It.IsAny<string>()))
-                .Returns(Task.FromResult((double)outPutUSDRate));
-
-            exchangeBaseOnUSDMoq.Setup(a => a.ExchangeBaseOnUSD(It.IsAny<string[]>()))
-                .Returns(Task.FromResult(new Dictionary<string, double>()));
-
-            //Act
-            Func<Task> act = async () => await new CryptoExchangeService(inputStub.Object, cryptoToUSDMoq.Object, exchangeBaseOnUSDMoq.Object)
-                                .ToFiat(cryptoCurrency, convertToStub.Object);
-
-            //Assert
-            await act.Should().ThrowAsync<NoUSDBaseQuoteProvidedException>();
-        }
-        [Fact]
-        public async Task ExchangeCryptoToFiat_WithWrongCrypto_ReturenBaseNotFoundException()
-        {
-            //Arrange
-            var cryptoCurrency = "wrongCoin";
-
-            convertToStub.Setup(a => a.GetAll())
-                .Returns(It.IsAny<IEnumerable<CurrencyModel>>());
-
-            inputStub.Setup(a => a.IsSymbolExist(It.IsAny<string>()))
-               .Returns(false);
-
-            cryptoToUSDMoq.Setup(a => a.GetUSDQuoteAsync(It.IsAny<string>()))
-                .Returns(Task.FromResult(It.IsAny<double>()));
-
-            exchangeBaseOnUSDMoq.Setup(a => a.ExchangeBaseOnUSD(It.IsAny<string[]>()))
-                .Returns(Task.FromResult(new Dictionary<string, double>() { { "tt2",1},
-                { "tt1",1} }));
-
-            //Act
-            Func<Task> act = async () => await new CryptoExchangeService(inputStub.Object, cryptoToUSDMoq.Object, exchangeBaseOnUSDMoq.Object)
-                                .ToFiat(cryptoCurrency, convertToStub.Object);
-
-            //Assert
-            await act.Should().ThrowAsync<SymbolNotFoundException>();
-        }
-        [Fact]
-        public async Task ExchangeCryptoToFiat_WithNullOrEmptyInput_ReturenSymbolNotProvidedException()
-        {
-            //Arrange
-            string nullInput = null;
-
-            convertToStub.Setup(a => a.GetAll())
-                .Returns(It.IsAny<IEnumerable<CurrencyModel>>());
-
-            inputStub.Setup(a => a.IsSymbolExist(It.IsAny<string>()))
-               .Returns(true);
-
-            cryptoToUSDMoq.Setup(a => a.GetUSDQuoteAsync(It.IsAny<string>()))
-                .Returns(Task.FromResult(It.IsAny<double>()));
-
-            exchangeBaseOnUSDMoq.Setup(a => a.ExchangeBaseOnUSD(It.IsAny<string[]>()))
-                .Returns(Task.FromResult(new Dictionary<string, double>() { { "tt2",1},
-                { "tt1",1} }));
-
-            //Act
-            Func<Task> act = async () => await new CryptoExchangeService(inputStub.Object, cryptoToUSDMoq.Object, exchangeBaseOnUSDMoq.Object)
-                                .ToFiat(nullInput, convertToStub.Object);
-
-            //Assert
-            await act.Should().ThrowAsync<SymbolNotProvidedException>();
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using CryptoExchange.ACL.CoinMarketCapModel;
 using Exchange.Common.Authentication.interfaces;
-using Exchange.Common.Config;
+using Exchange.Common.Currency;
 using Exchange.Common.CustomException;
 using Exchange.Common.interfaces;
 using Polly;
@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace CryptoExchange.ACL.CoinMarketCap
 {
-    public class CoinMarketCapAPI : ICryptoToUSD
+    public class CoinMarketCapAPI : IConvertSingle
     {
         private readonly RestClient _client;
         private int _maxRetries ;
@@ -33,22 +33,23 @@ namespace CryptoExchange.ACL.CoinMarketCap
                    sleepDurationProvider: _ => TimeSpan.FromSeconds(1),
                    onRetry: (exception, sleepDuration, attemptNumber, context) =>
                    {
-                       //Log($"Too many requests. Retrying in {sleepDuration}. {attemptNumber} / {MAX_RETRIES}");
+                       throw new ThirdPartyAPIServiceUnavailableException();
                    });
         }
-        public async Task<double> GetUSDQuoteAsync(string cryptoSymbol)
+
+        public async Task<double> ConvertTo(CurrencyModel fromCurrency, CurrencyModel toCurrency)
         {
             var request = new RestRequest("v2/tools/price-conversion", Method.Get);
             request.AddQueryParameter("amount", 1);
-            request.AddQueryParameter("symbol", cryptoSymbol);
-            request.AddQueryParameter("convert", "USD");
-            
-            var respone= await _retryPolicy.ExecuteAsync(async () =>
+            request.AddQueryParameter("symbol", fromCurrency.Symbol);
+            request.AddQueryParameter("convert", toCurrency.Symbol);
+
+            var respone = await _retryPolicy.ExecuteAsync(async () =>
             {
                 var res = await _client.ExecuteGetAsync(request);
                 if (!res.IsSuccessful)
                 {
-                    throw new ThirdPartyAPIServiceUnavailableException();
+                    throw new NoResponseThirdPartyAPIServiceException();
                 }
                 return res;
             });

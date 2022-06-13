@@ -1,4 +1,5 @@
-﻿using Exchange.Common.interfaces;
+﻿using Exchange.Common.Currency;
+using Exchange.Common.interfaces;
 using ExchangeCurrency.Specs.Fakes;
 using ExchangeCurrency.Specs.Setup;
 using ExchangeCurrency.Web;
@@ -32,8 +33,9 @@ namespace ExchangeCurrency.Specs
             _client = _factory.WithWebHostBuilder(builder=> {
                 builder.ConfigureTestServices(service =>
                 {
-                    service.AddScoped<ICryptoToUSD, FakeCryptotoUSD>();
-                    service.AddScoped<IExchangeBaseOnUSD, FakeExchangeBaseOnUSD>(); 
+                    service.AddSingleton<IFiatCurrency>(new FiatCurrency(null, new FakeFiatConvertAll()));
+                    service.AddSingleton<ICryptoCurrency>(new CryptoCurrency(new FakeCryptoConvertTo(), null));
+
                     service.AddAuthentication("Test")
                      .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
                          "Test", options => { });

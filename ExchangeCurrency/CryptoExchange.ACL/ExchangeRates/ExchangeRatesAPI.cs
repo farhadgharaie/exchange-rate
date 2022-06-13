@@ -1,6 +1,7 @@
 ﻿using CryptoExchange.ACL.ExchangeRates.ExchangeRatesModel;
 using Exchange.Common.Authentication.interfaces;
 using Exchange.Common.Config;
+using Exchange.Common.Currency;
 using Exchange.Common.CustomException;
 using Exchange.Common.interfaces;
 using Polly;
@@ -8,6 +9,7 @@ using Polly.Retry;
 using RestSharp;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.Json;
@@ -16,7 +18,7 @@ using System.Threading.Tasks;
 namespace CryptoExchange.ACL.ExchangeRates
 {
    
-    public class ExchangeRatesAPI: IExchangeBaseOnUSD
+    public class ExchangeRatesAPI: IConvertAll
     {
         private readonly RestClient _client;
         private int _maxRetries ;
@@ -35,22 +37,24 @@ namespace CryptoExchange.ACL.ExchangeRates
                    sleepDurationProvider: _ => TimeSpan.FromSeconds(1),
                    onRetry: (exception, sleepDuration, attemptNumber, context) =>
                    {
-                       //Log($"Too many requests. Retrying in {sleepDuration}. {attemptNumber} / {MAX_RETRIES}");
+                       throw new ThirdPartyAPIServiceUnavailableException();
                    });
         }
-        public async Task<Dictionary<string, double>> ExchangeBaseOnUSD(string[] exchangeTo)
+
+        public async Task<Dictionary<string, double>> ConvertTo(CurrencyModel fromCurrency, IEnumerable<CurrencyModel> convertTo)
         {
+            var exchangeTo = convertTo.ToList().Select(a => a.Symbol).ToArray();
             var request = new RestRequest("exchangerates_data/latest", Method.Get);
             request.AddQueryParameter("apikey", _config.GetAPIKey());
-            request.AddQueryParameter("base", "USD");
-            request.AddQueryParameter("symbols", string.Join(",",exchangeTo));
+            request.AddQueryParameter("base", fromCurrency.Symbol);
+            request.AddQueryParameter("symbols", string.Join(",", exchangeTo));
 
             var respone = await _retryPolicy.ExecuteAsync(async () =>
             {
                 var res = await _client.ExecuteGetAsync(request);
                 if (!res.IsSuccessful)
                 {
-                    throw new ThirdPartyAPIServiceUnavailableException();
+                    throw new NoResponseThirdPartyAPIServiceException();
                 }
                 return res;
             });
@@ -58,7 +62,7 @@ namespace CryptoExchange.ACL.ExchangeRates
             var data = JsonSerializer.Deserialize<ExchangeRateAPIResponse>(respone.Content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             if (data.success)
             {
-                var rates=data.rates;
+                var rates = data.rates;
                 foreach (var rate in rates)
                 {
                     result.Add(rate.Key, rate.Value);

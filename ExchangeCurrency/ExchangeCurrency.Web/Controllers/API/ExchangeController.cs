@@ -19,12 +19,15 @@ namespace ExchangeCurrency.Web.Controllers.API
     {
         private readonly ILogger<HomeController> _logger;
         private readonly ICryptoExchangeService _cryptoExchangeService;
+        private readonly IFiatCurrency _fiatCurrency;
 
         public ExchangeController(ILogger<HomeController> logger,
-                              ICryptoExchangeService cryptoExchangeService)
+                                  ICryptoExchangeService cryptoExchangeService,
+                                  IFiatCurrency fiatCurrency)
         {
             _logger = logger;
             _cryptoExchangeService = cryptoExchangeService;
+            _fiatCurrency = fiatCurrency;
 
         }
         [Route("Crypto")]
@@ -34,7 +37,7 @@ namespace ExchangeCurrency.Web.Controllers.API
             try
             {
                 Dictionary<string, double> CurrencyQuotes;
-                CurrencyQuotes = await _cryptoExchangeService.ToFiat(symbol, new FiatCurrency());
+                CurrencyQuotes = await _cryptoExchangeService.ToFiat(symbol, _fiatCurrency);
                 return Ok(CurrencyQuotes);
             }
             catch(SymbolNotFoundException ex)
